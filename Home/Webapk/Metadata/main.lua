@@ -252,7 +252,7 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
                     if ipv6Code == 200 and ipv6Content and ipv6Content:match("%S") then
                       addStyledText("IPv6: " .. ipv6Content:gsub("%s+", ""), 14, 0xFF444444)
                     end
-                    addStyledText("\n@Surfing Webbrowser 2023.\n 星宇点动", 16, 0xFF444444)
+                    addStyledText("\n@Surfing Webbrowser 2023.", 16, 0xFF444444)
                   end)
                 end
               end)
