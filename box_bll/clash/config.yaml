@@ -119,7 +119,7 @@ sniffer:
 
 # 网卡模块
 tun:
-  enable: true  # true 开 # false 默认关
+  enable: true  # true 开 # false 默认关 可以自行体验关闭可能会影响某些平台改IP
   device: Meta
   stack: gvisor
   dns-hijack:
@@ -131,6 +131,8 @@ tun:
   auto-redirect: false
   auto-detect-interface: true
   exclude-package:
+    - com.tencent.mm
+    - com.tencent.mobileqq
     # _____________________# 三星专供 ↓ 范围
 #    - com.samsung.android.messaging
 #    - com.samsung.android.app.telephonyui
@@ -143,7 +145,6 @@ tun:
 #    - com.sec.epdg
 #    - com.sec.imsservice # 三星专供 ↑ 范围
     # 非三星用户不必理会，三星用户需自行取消注释
-    
 # —————————
 
 
@@ -162,22 +163,22 @@ dns:
     - "+.3gppnetwork.org"
     - "+.xtracloud.net"
   direct-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 瓦洛兰大陆&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 瓦洛兰大陆&h3=true
+    - https://doh.pub/dns-query#🇨🇳 Chinese&h3=false
+    - https://dns.alidns.com/dns-query#🇨🇳 Chinese&h3=true
   proxy-server-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 瓦洛兰大陆&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 瓦洛兰大陆&h3=true
+    - https://doh.pub/dns-query#🇨🇳 Chinese&h3=false
+    - https://dns.alidns.com/dns-query#🇨🇳 Chinese&h3=true
   nameserver-policy:
     "RULE-SET:CN_域,Microsoft_域,Apple_域":
-       - https://doh.pub/dns-query#🇨🇳 瓦洛兰大陆&h3=false
-       - https://dns.alidns.com/dns-query#🇨🇳 瓦洛兰大陆&h3=true
+       - https://doh.pub/dns-query#🇨🇳 Chinese&h3=false
+       - https://dns.alidns.com/dns-query#🇨🇳 Chinese&h3=true
   nameserver:
     - https://dns.google/dns-query#DNS连接&h3=true
     - https://cloudflare-dns.com/dns-query#DNS连接&h3=true
 # —————————
 
 proxies:
-  - {name: 🇨🇳 瓦洛兰大陆, type: direct, udp: true}
+  - {name: 🇨🇳 Chinese, type: direct, udp: true}
   - {name: ⛔️ 拒绝连接, type: reject}
   - {name: 🌐 DNS_Hijack, type: dns}
 
@@ -190,24 +191,24 @@ proxy_groups: &proxy_groups
       - 故障转移
       - 负载均衡
       - 香港节点
-      - 台湾节点
+      - 中国台湾
       - 狮城节点
       - 日本节点
       - 美国节点
       - 其它地区
-      - 🇨🇳 瓦洛兰大陆
+      - 🇨🇳 Chinese
     <<: *A
 CNproxy_groups: &CNproxy_groups
     type: select
     proxies:
-      - 🇨🇳 瓦洛兰大陆
+      - 🇨🇳 Chinese
       - ⛔️ 拒绝连接
       - 总模式
       - 延迟最低
       - 故障转移
       - 负载均衡
       - 香港节点
-      - 台湾节点
+      - 中国台湾
       - 狮城节点
       - 日本节点
       - 美国节点
@@ -223,18 +224,18 @@ proxy-groups:
       - 故障转移
       - 负载均衡
       - 香港节点
-      - 台湾节点
+      - 中国台湾
       - 狮城节点
       - 日本节点
       - 美国节点
       - 其它地区
-      - 🇨🇳 瓦洛兰大陆
+      - 🇨🇳 Chinese
 
   - name: 订阅更新
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Update.svg"
     type: select
     proxies:
-      - 🇨🇳 瓦洛兰大陆
+      - 🇨🇳 Chinese
       - 总模式
 
   - name: 小红书
@@ -355,7 +356,7 @@ proxy-groups:
     strategy: round-robin
     <<: *A
 
-  - name: 台湾节点
+  - name: 中国台湾
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
     filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
     <<: *All
@@ -391,7 +392,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 86400
     proxies:
-      - 🇨🇳 瓦洛兰大陆
+      - 🇨🇳 Chinese
 # —————————
 
 rule-anchor:
@@ -637,10 +638,10 @@ rules:
 
   - DOMAIN,browserleaks.com,漏网之鱼
 
-  - RULE-SET,CN_域,🇨🇳 瓦洛兰大陆
-  - RULE-SET,CN_IP,🇨🇳 瓦洛兰大陆
-  - RULE-SET,Private_域,🇨🇳 瓦洛兰大陆
-  - RULE-SET,Private_IP,🇨🇳 瓦洛兰大陆
+  - RULE-SET,CN_域,🇨🇳 Chinese
+  - RULE-SET,CN_IP,🇨🇳 Chinese
+  - RULE-SET,Private_域,🇨🇳 Chinese
+  - RULE-SET,Private_IP,🇨🇳 Chinese
 
   - MATCH,漏网之鱼
 # —————————
