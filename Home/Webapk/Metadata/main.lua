@@ -73,7 +73,7 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
               webView.loadUrl(url)
             end
             
-            menu.add("背景 URL").onMenuItemClick = function()
+            menu.add("背景图床 URL").onMenuItemClick = function()
               local intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://pomf2.lain.la/"))
               activity.startActivity(intent)
               return true
