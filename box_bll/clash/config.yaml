@@ -346,11 +346,6 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/User.svg"
     <<: *CNproxy_groups
 
-  - name: 智能策略 / ALL
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Ai.svg"
-    filter: "^(?!.*(套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|失联|余额|拒绝|DNS|Ch)).*$"
-    <<: *All
-
   - name: 传统·延迟最低
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: url-test
@@ -366,6 +361,11 @@ proxy-groups:
     type: load-balance
     strategy: round-robin
     <<: *A
+
+  - name: 智能策略 / ALL
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Ai.svg"
+    filter: "^(?!.*(套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|失联|余额|拒绝|DNS|Ch)).*$"
+    <<: *All
 
   - name: 智能·香港节点
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
