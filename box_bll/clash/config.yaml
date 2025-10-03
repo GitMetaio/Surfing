@@ -244,7 +244,7 @@ proxy-groups:
       - 🇨🇳 直连·Chinese
       - 总模式
 
-  - name: 弱智吧
+  - name: 试管基地
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/XiaoHongShu.svg"
     <<: *CNproxy_groups
 
@@ -594,8 +594,8 @@ rules:
   - PROCESS-PATH,com.ss.android.ugc.aweme,抖音
   - RULE-SET,DouYin_域,抖音
 
-  - PROCESS-PATH,com.xingin.xhs,弱智吧
-  - RULE-SET,XiaoHongShu_域,弱智吧
+  - PROCESS-PATH,com.xingin.xhs,试管基地
+  - RULE-SET,XiaoHongShu_域,试管基地
 
   - PROCESS-PATH,tv.danmaku.bili,BiliBili
   - RULE-SET,BiliBili_域,BiliBili
