@@ -62,7 +62,12 @@ A: &A
   - 3.额外地址
 
 All: &All
-  type: url-test
+  type: smart
+  policy-priority: "香港:1.4;HK:1.4;美国:1.0;US:1.0;新加坡:1.2;SG:1.2"
+  uselightgbm: true
+  collectdata: true
+  strategy: sticky-sessions
+  include-all: true
   use:
   - 1.主要地址
   - 2.备用地址
@@ -119,7 +124,7 @@ sniffer:
 
 # 网卡模块
 tun:
-  enable: true  # true 开 # false 默认关 可以自行体验关闭可能会影响某些平台改IP
+  enable: true
   device: Meta
   stack: gvisor
   dns-hijack:
@@ -133,6 +138,7 @@ tun:
   exclude-package:
     - com.tencent.mm
     - com.tencent.mobileqq
+    - com.miui.securitycenter
     # _____________________# 三星专供 ↓ 范围
 #    - com.samsung.android.messaging
 #    - com.samsung.android.app.telephonyui
@@ -157,28 +163,28 @@ dns:
   enhanced-mode: fake-ip
   fake-ip-range: 172.20.0.1/16
   fake-ip-filter:
-    - "RULE-SET:CN_域"
     - "RULE-SET:Private_域"
     - "RULE-SET:GoogleFCM_域"
     - "+.3gppnetwork.org"
     - "+.xtracloud.net"
+    - "+.market.xiaomi.com"
   direct-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 Chinese&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 Chinese&h3=true
+    - https://doh.pub/dns-query#🇨🇳 直连·Chinese&h3=false
+    - https://dns.alidns.com/dns-query#🇨🇳 直连·Chinese&h3=true
   proxy-server-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 Chinese&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 Chinese&h3=true
+    - https://doh.pub/dns-query#🇨🇳 直连·Chinese&h3=false
+    - https://dns.alidns.com/dns-query#🇨🇳 直连·Chinese&h3=true
   nameserver-policy:
     "RULE-SET:CN_域,Microsoft_域,Apple_域":
-       - https://doh.pub/dns-query#🇨🇳 Chinese&h3=false
-       - https://dns.alidns.com/dns-query#🇨🇳 Chinese&h3=true
+       - https://doh.pub/dns-query#🇨🇳 直连·Chinese&h3=false
+       - https://dns.alidns.com/dns-query#🇨🇳 直连·Chinese&h3=true
   nameserver:
     - https://dns.google/dns-query#DNS连接&h3=true
     - https://cloudflare-dns.com/dns-query#DNS连接&h3=true
 # —————————
 
 proxies:
-  - {name: 🇨🇳 Chinese, type: direct, udp: true}
+  - {name: 🇨🇳 直连·Chinese, type: direct, udp: true}
   - {name: ⛔️ 拒绝连接, type: reject}
   - {name: 🌐 DNS_Hijack, type: dns}
 
@@ -187,32 +193,32 @@ proxy_groups: &proxy_groups
     proxies:
       - 总模式
       - ⛔️ 拒绝连接
-      - 延迟最低
-      - 故障转移
-      - 负载均衡
-      - 香港节点
-      - 中国台湾
-      - 狮城节点
-      - 日本节点
-      - 美国节点
-      - 其它地区
-      - 🇨🇳 Chinese
+      - 传统·延迟最低
+      - 传统·故障转移
+      - 传统·负载均衡
+      - 智能·香港节点
+      - 智能·中国台湾
+      - 智能·狮城节点
+      - 智能·日本节点
+      - 智能·美国节点
+      - 智能·其它地区
+      - 🇨🇳 直连·Chinese
     <<: *A
 CNproxy_groups: &CNproxy_groups
     type: select
     proxies:
-      - 🇨🇳 Chinese
+      - 🇨🇳 直连·Chinese
       - ⛔️ 拒绝连接
       - 总模式
-      - 延迟最低
-      - 故障转移
-      - 负载均衡
-      - 香港节点
-      - 中国台湾
-      - 狮城节点
-      - 日本节点
-      - 美国节点
-      - 其它地区
+      - 传统·延迟最低
+      - 传统·故障转移
+      - 传统·负载均衡
+      - 智能·香港节点
+      - 智能·中国台湾
+      - 智能·狮城节点
+      - 智能·日本节点
+      - 智能·美国节点
+      - 智能·其它地区
     <<: *A
 # —————————
 proxy-groups:
@@ -220,22 +226,22 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/All.svg"
     type: select
     proxies:
-      - 延迟最低
-      - 故障转移
-      - 负载均衡
-      - 香港节点
-      - 中国台湾
-      - 狮城节点
-      - 日本节点
-      - 美国节点
-      - 其它地区
-      - 🇨🇳 Chinese
+      - 传统·延迟最低
+      - 智能策略 / ALL
+      - 传统·负载均衡
+      - 智能·香港节点
+      - 智能·中国台湾
+      - 智能·狮城节点
+      - 智能·日本节点
+      - 智能·美国节点
+      - 智能·其它地区
+      - 🇨🇳 直连·Chinese
 
   - name: 订阅更新
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Update.svg"
     type: select
     proxies:
-      - 🇨🇳 Chinese
+      - 🇨🇳 直连·Chinese
       - 总模式
 
   - name: 小红书
@@ -340,59 +346,57 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/User.svg"
     <<: *CNproxy_groups
 
-  - name: 延迟最低
+  - name: 智能策略 / ALL
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Ai.svg"
+    filter: "^(?!.*(套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|失联|余额|拒绝|DNS|Ch)).*$"
+    <<: *All
+
+  - name: 传统·延迟最低
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: url-test
     <<: *A
 
-  - name: 故障转移
+  - name: 传统·故障转移
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: fallback
     <<: *A
 
-  - name: 负载均衡
+  - name: 传统·负载均衡
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: load-balance
     strategy: round-robin
     <<: *A
 
-  - name: 中国台湾
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
-    filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
-    <<: *All
-
-  - name: 香港节点
+  - name: 智能·香港节点
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
     filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
     <<: *All
 
-  - name: 日本节点
+  - name: 智能·中国台湾
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
+    filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
+    <<: *All
+
+  - name: 智能·日本节点
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/JP.svg"
     filter: "^(?=.*(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan)).*$"
     <<: *All
 
-  - name: 美国节点
+  - name: 智能·美国节点
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/US.svg"
     filter: "^(?=.*(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States)).*$"
     <<: *All
 
-  - name: 狮城节点
+  - name: 智能·狮城节点
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Singapore.svg"
     filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"
     <<: *All
 
-  - name: 其它地区
+  - name: 智能·其它地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Globe.svg"
     filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网)).*$"
     <<: *All
-    
-  - name: CNTEST
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Meter.svg"
-    type: select
-    url: https://www.gstatic.com/generate_204
-    interval: 86400
-    proxies:
-      - 🇨🇳 Chinese
+
 # —————————
 
 rule-anchor:
@@ -638,10 +642,10 @@ rules:
 
   - DOMAIN,browserleaks.com,漏网之鱼
 
-  - RULE-SET,CN_域,🇨🇳 Chinese
-  - RULE-SET,CN_IP,🇨🇳 Chinese
-  - RULE-SET,Private_域,🇨🇳 Chinese
-  - RULE-SET,Private_IP,🇨🇳 Chinese
+  - RULE-SET,CN_域,🇨🇳 直连·Chinese
+  - RULE-SET,CN_IP,🇨🇳 直连·Chinese
+  - RULE-SET,Private_域,🇨🇳 直连·Chinese
+  - RULE-SET,Private_IP,🇨🇳 直连·Chinese
 
   - MATCH,漏网之鱼
 # —————————
