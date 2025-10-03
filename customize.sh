@@ -187,10 +187,14 @@ if [ -d /data/adb/box_bll ]; then
   mkdir -p "$HOSTS_PATH"
   touch "$HOSTS_FILE"
   
+  cp /data/adb/box_bll/bin/clash /data/adb/box_bll/bin/clash.bak
+  
   cp /data/adb/box_bll/clash/config.yaml /data/adb/box_bll/clash/config.yaml.bak
   cp /data/adb/box_bll/scripts/box.config /data/adb/box_bll/scripts/box.config.bak
   cp -f "$MODPATH/box_bll/clash/config.yaml" /data/adb/box_bll/clash/
   cp -f "$MODPATH/box_bll/clash/Toolbox.sh" /data/adb/box_bll/clash/
+  cp -f "$MODPATH/box_bll/clash/Model.bin" /data/adb/box_bll/clash/
+  cp -f "$MODPATH/box_bll/bin/clash" /data/adb/box_bll/bin/
   
   if [ "$COPY_WEB" = true ]; then
     cp -rf "$MODPATH/box_bll/clash/Web" /data/adb/box_bll/clash/
