@@ -185,9 +185,9 @@ download_all_rules() {
     done
 }
 
-CURRENT_VERSION="v13.5.5"
+CURRENT_VERSION="v13.5.6"
 UPDATE_LOG="更新日志: 
-解决后台异常内存占用..."
+临时禁用核心更新..."
 
 TOOLBOX_URL="https://raw.githubusercontent.com/GitMetaio/Surfing/main/box_bll/clash/Toolbox.sh"
 TOOLBOX_FILE="/data/adb/box_bll/clash/Toolbox.sh"
@@ -1192,6 +1192,11 @@ reload_configuration() {
     fi
 }
 update_core() {
+    if [ "$NO_UPDATE_ENABLED" = "true" ]; then
+        echo "↴"
+        echo "当前选项是禁用状态，不允许执行该操作！"
+        return
+    fi
     if [ ! -f "$MODULE_PROP" ]; then
         echo "↴" 
         echo "当前未安装模块！"
