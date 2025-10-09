@@ -1,3 +1,17 @@
+# v7.5.7
+### 👨‍🔧 Debug   
+  - **支持**: 自动更新内核 需在 `box.config` 配置开启
+  - **修复**: `Another app is currently holding the xtables lock. Perhaps you want to use the -w option?  
+` `iptables` 锁可能导致的冲突？命令执行失败 使用 `-w` 变量  
+  - **修复**: `CUP` 及内存占用异常，设备发热问题
+  - **进程管理优化**：独立 `PID` 文件管理，优雅退出 `trap` 防止残留多个僵尸实例 `sleep`  
+  -  `sleep` 可被 `kill` 打断，安全退出
+
+### 🛠️ Config  
+  - **支持** **传统 / 智能(smart)** 策略
+  - **移除** 电流/功耗 监测
+  - 整体优化了一下 
+
 # v7.5.6
 ### ✅️ Smart 智能调度 (LightGBM 模型) 支持
   - 自动学习节点连接历史（成功率 / 延迟 / ASN / 地理分布等特征)，动态计算权重  `[Smart] Status: [closed], Updated weights: (Model: [LightGBM], TCP: [0.5649], ...)`
