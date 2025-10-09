@@ -4,13 +4,16 @@ export PATH="/data/adb/magisk:/data/adb/ksu/bin:/data/adb/ap/bin:$PATH:/data/dat
   
 scripts=$(realpath $0)  
 scripts_dir=$(dirname ${scripts})  
-  
+
 source ${scripts_dir}/box.config  
 
 mark_id="16777216/16777216"  
 table_id="2024"  
 # routing_mark="233"  
-  
+
+iptables="iptables -w"
+ip6tables="ip6tables -w"
+
 log() {
 export TZ=Asia/Shanghai
 now=$(date +"[%Y-%m-%d %H:%M:%S %Z]")
