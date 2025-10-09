@@ -17,10 +17,9 @@ INOTIFY_SCRIPT="/data/adb/box_bll/scripts/box.inotify"
 HOSTS_PATH="/data/adb/box_bll/clash/etc/"
 HOSTS_FILE="/data/adb/box_bll/clash/etc/hosts"
 SYSTEM_HOSTS="/system/etc/hosts"
-mkdir -p ${run_path}
-
-MONITOR_SCRIPT="${SCRIPTS_DIR}/box.monitor"
-MONITOR_PID_FILE="${SCRIPTS_DIR}/../run/monitor.pid"
+TMP_PID_DIR="/data/adb/modules/Surfing"
+mkdir -p "${run_path}"
+mkdir -p "$TMP_PID_DIR"
 
 service_control() {
   if [ ! -f "${box_path}/manual" ]; then
@@ -28,13 +27,29 @@ service_control() {
       if [ "${EVENT}" = "d" ]; then
         ${SERVICE_PATH} start >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
         ${TPROXY_PATH} enable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
-        nohup "$MONITOR_SCRIPT" >> "${run_path}/run_error.log" 2>&1 &
+        for task in upgrade linkclear; do
+            pid_file="${TMP_PID_DIR}/${task}.pid"
+            if [ ! -f "$pid_file" ] || ! kill -0 "$(cat "$pid_file")" 2>/dev/null; then
+                "${SCRIPTS_DIR}/box.${task}" >> "${run_path}/run_error.log" 2>&1 &
+            fi
+        done
       elif [ "${EVENT}" = "n" ]; then
         ${TPROXY_PATH} disable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
         ${SERVICE_PATH} stop >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
-        if [ -f "$MONITOR_PID_FILE" ]; then
-          rm -f "$MONITOR_PID_FILE"
-        fi
+        for pid_file in upgrade linkclear ; do
+          pid_path="${TMP_PID_DIR}/${pid_file}.pid"
+          if [ -f "$pid_path" ]; then
+            pid=$(cat "$pid_path")
+            if kill -0 "$pid" 2>/dev/null; then
+              kill -TERM "$pid" 2>/dev/null
+              sleep 1
+              if kill -0 "$pid" 2>/dev/null; then
+                kill -9 "$pid" 2>/dev/null
+              fi
+            fi
+            rm -f "$pid_path"
+          fi
+        done
       fi
     fi
   fi
