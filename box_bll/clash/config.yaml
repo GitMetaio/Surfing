@@ -62,6 +62,13 @@ A: &A
   - 3.额外地址
 
 All: &All
+  type: url-test
+  use:
+  - 1.主要地址
+  - 2.备用地址
+  - 3.额外地址
+
+All_smart: &All_smart
   type: smart
   policy-priority: "香港:1.4;HK:1.4;美国:1.0;US:1.0;新加坡:1.2;SG:1.2"
   uselightgbm: true
@@ -168,55 +175,67 @@ dns:
     - "+.xtracloud.net"
     - "+.market.xiaomi.com"
   direct-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 直连·Chinese&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 直连·Chinese&h3=true
+    - https://doh.pub/dns-query#🌐 本地·直接连接&h3=false
+    - https://dns.alidns.com/dns-query#🌐 本地·直接连接&h3=true
   proxy-server-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 直连·Chinese&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 直连·Chinese&h3=true
+    - https://doh.pub/dns-query#🌐 本地·直接连接&h3=false
+    - https://dns.alidns.com/dns-query#🌐 本地·直接连接&h3=true
   nameserver-policy:
     "RULE-SET:CN_域,Microsoft_域,Apple_域":
-       - https://doh.pub/dns-query#🇨🇳 直连·Chinese&h3=false
-       - https://dns.alidns.com/dns-query#🇨🇳 直连·Chinese&h3=true
+       - https://doh.pub/dns-query#🌐 本地·直接连接&h3=false
+       - https://dns.alidns.com/dns-query#🌐 本地·直接连接&h3=true
   nameserver:
     - https://dns.google/dns-query#DNS连接&h3=true
     - https://cloudflare-dns.com/dns-query#DNS连接&h3=true
 # —————————
 
 proxies:
-  - {name: 🇨🇳 直连·Chinese, type: direct, udp: true}
-  - {name: ⛔️ 拒绝连接, type: reject}
+  - {name: 🌐 本地·直接连接, type: direct, udp: true}
+  - {name: ⛔️ 禁止·拒绝连接, type: reject}
   - {name: 🌐 DNS_Hijack, type: dns}
 
 proxy_groups: &proxy_groups
     type: select
     proxies:
       - 总模式
-      - ⛔️ 拒绝连接
-      - 传统·延迟最低
-      - 传统·故障转移
-      - 传统·负载均衡
-      - 智能·香港节点
+      - ALL·延迟最低
+      - ALL·故障转移
+      - ALL·负载均衡
+      - 传统·香港地区
+      - 智能·香港地区
+      - 传统·中国台湾
       - 智能·中国台湾
-      - 智能·狮城节点
-      - 智能·日本节点
-      - 智能·美国节点
+      - 传统·狮城地区
+      - 智能·狮城地区
+      - 传统·日本地区
+      - 智能·日本地区
+      - 传统·美国地区
+      - 智能·美国地区
+      - 传统·其它地区
       - 智能·其它地区
-      - 🇨🇳 直连·Chinese
+      - ⛔️ 禁止·拒绝连接
+      - 🌐 本地·直接连接
     <<: *A
 CNproxy_groups: &CNproxy_groups
     type: select
     proxies:
-      - 🇨🇳 直连·Chinese
-      - ⛔️ 拒绝连接
+      - 🌐 本地·直接连接
+      - ⛔️ 禁止·拒绝连接
       - 总模式
-      - 传统·延迟最低
-      - 传统·故障转移
-      - 传统·负载均衡
-      - 智能·香港节点
+      - ALL·延迟最低
+      - ALL·故障转移
+      - ALL·负载均衡
+      - 传统·香港地区
+      - 智能·香港地区
+      - 传统·中国台湾
       - 智能·中国台湾
-      - 智能·狮城节点
-      - 智能·日本节点
-      - 智能·美国节点
+      - 传统·狮城地区
+      - 智能·狮城地区
+      - 传统·日本地区
+      - 智能·日本地区
+      - 传统·美国地区 
+      - 智能·美国地区
+      - 传统·其它地区
       - 智能·其它地区
     <<: *A
 # —————————
@@ -225,47 +244,55 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/All.svg"
     type: select
     proxies:
-      - 传统·延迟最低
-      - 智能策略 / ALL
-      - 传统·负载均衡
-      - 智能·香港节点
+      - ALL·延迟最低
+      - ALL·负载均衡
+      - ALL·故障转移
+      - 智能调度 / ALL
+      - 传统·香港地区
+      - 智能·香港地区
+      - 传统·中国台湾
       - 智能·中国台湾
-      - 智能·狮城节点
-      - 智能·日本节点
-      - 智能·美国节点
+      - 传统·狮城地区
+      - 智能·狮城地区
+      - 传统·日本地区
+      - 智能·日本地区
+      - 传统·美国地区
+      - 智能·美国地区
+      - 传统·其它地区
       - 智能·其它地区
-      - 🇨🇳 直连·Chinese
+      - ⛔️ 禁止·拒绝连接
+      - 🌐 本地·直接连接
 
   - name: 订阅更新
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Update.svg"
     type: select
     proxies:
-      - 🇨🇳 直连·Chinese
+      - 🌐 本地·直接连接
       - 总模式
 
-  - name: 试管基地
+  - name: 小红书
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/XiaoHongShu.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: 抖音
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/DouYin.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: BiliBili
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/BiliBili.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Steam
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Steam.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Apple
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Apple.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Microsoft
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Microsoft.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Telegram
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Telegram.svg"
@@ -327,75 +354,94 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/No-ads-all.svg"
     type: select
     proxies:
-      - ⛔️ 拒绝连接
-      - 🌐 DNS_Hijack
-      - REJECT-DROP
       - PASS
+      - REJECT-DROP
+      - ⛔️ 禁止·拒绝连接
+      - 🌐 DNS_Hijack
 
   - name: WebRTC
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/WebRTC.svg"
     type: select
     proxies:
-      - ⛔️ 拒绝连接
-      - 🌐 DNS_Hijack
-      - REJECT-DROP
       - PASS
+      - REJECT-DROP
+      - ⛔️ 禁止·拒绝连接
+      - 🌐 DNS_Hijack
 
-  - name: 白名单出站
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/User.svg"
-    <<: *CNproxy_groups
-
-  - name: 传统·延迟最低
+  - name: ALL·延迟最低
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: url-test
     <<: *A
 
-  - name: 传统·故障转移
+  - name: ALL·故障转移
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: fallback
     <<: *A
 
-  - name: 传统·负载均衡
+  - name: ALL·负载均衡
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: load-balance
     strategy: round-robin
     <<: *A
 
-  - name: 智能策略 / ALL
+  - name: 智能调度 / ALL
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Ai.svg"
     filter: "^(?!.*(套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|失联|余额|拒绝|DNS|Ch)).*$"
-    <<: *All
+    <<: *All_smart
 
-  - name: 智能·香港节点
+  - name: 传统·香港地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
     filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
     <<: *All
+  - name: 智能·香港地区
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
+    filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
+    <<: *All_smart
 
-  - name: 智能·中国台湾
+  - name: 传统·中国台湾
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
     filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
     <<: *All
+  - name: 智能·中国台湾
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
+    filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
+    <<: *All_smart
 
-  - name: 智能·日本节点
+  - name: 传统·日本地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/JP.svg"
     filter: "^(?=.*(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan)).*$"
     <<: *All
+  - name: 智能·日本地区
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/JP.svg"
+    filter: "^(?=.*(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan)).*$"
+    <<: *All_smart
 
-  - name: 智能·美国节点
+  - name: 传统·美国地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/US.svg"
     filter: "^(?=.*(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States)).*$"
     <<: *All
+  - name: 智能·美国地区
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/US.svg"
+    filter: "^(?=.*(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States)).*$"
+    <<: *All_smart
 
-  - name: 智能·狮城节点
+  - name: 传统·狮城地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Singapore.svg"
     filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"
     <<: *All
+  - name: 智能·狮城地区
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Singapore.svg"
+    filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"
+    <<: *All_smart
 
-  - name: 智能·其它地区
+  - name: 传统·其它地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Globe.svg"
     filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch)).*$"
     <<: *All
-
+  - name: 智能·其它地区
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Globe.svg"
+    filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch)).*$"
+    <<: *All_smart
 # —————————
 
 rule-anchor:
@@ -407,17 +453,11 @@ rule-anchor:
     {type: http, behavior: ipcidr, format: mrs, interval: 86400}
   Domain: &Domain
     {type: http, behavior: domain, format: mrs, interval: 86400}
-
 # —————————
-
 
 # 部分规则上游为https://github.com/blackmatrix7/ios_rule_script
 # Github Actions 每日自动同步跟随更新
 rule-providers:
-  自定义出站: # 主要用于广告误杀自定义放行
-    <<: *Local
-    path: ./etc/自定义规则.list # 请按路径新建文件及建立你需要的规则
-
   WebRTC_端/域:
     <<: *Classical
     path: ./rules/WebRTC.list
@@ -585,16 +625,14 @@ rules:
   - DST-PORT,53,🌐 DNS_Hijack
   - DST-PORT,853,DNS连接
 
-  - RULE-SET,自定义出站,白名单出站
-
   - RULE-SET,WebRTC_端/域,WebRTC
   - RULE-SET,No-ads-all_域,广告拦截
 
   - PROCESS-PATH,com.ss.android.ugc.aweme,抖音
   - RULE-SET,DouYin_域,抖音
 
-  - PROCESS-PATH,com.xingin.xhs,试管基地
-  - RULE-SET,XiaoHongShu_域,试管基地
+  - PROCESS-PATH,com.xingin.xhs,小红书
+  - RULE-SET,XiaoHongShu_域,小红书
 
   - PROCESS-PATH,tv.danmaku.bili,BiliBili
   - RULE-SET,BiliBili_域,BiliBili
@@ -639,11 +677,11 @@ rules:
   - RULE-SET,Telegram_域,Telegram
   - RULE-SET,Telegram_IP,Telegram,no-resolve
 
-  - RULE-SET,Private_域,🇨🇳 直连·Chinese
-  - RULE-SET,Private_IP,🇨🇳 直连·Chinese,no-resolve
+  - RULE-SET,Private_域,🌐 本地·直接连接
+  - RULE-SET,Private_IP,🌐 本地·直接连接,no-resolve
 
-  - RULE-SET,CN_域,🇨🇳 直连·Chinese
-  - RULE-SET,CN_IP,🇨🇳 直连·Chinese
+  - RULE-SET,CN_域,🌐 本地·直接连接
+  - RULE-SET,CN_IP,🌐 本地·直接连接
 
   - MATCH,漏网之鱼
 # —————————
