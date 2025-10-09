@@ -1,0 +1,58 @@
+#!/system/bin/sh
+export PATH="/system/bin:/system/xbin:/data/adb/magisk:/data/adb/ksu/bin:/data/adb/ap/bin:$PATH"
+
+SCRIPTS_DIR=$(dirname "$(realpath "$0")")
+LOG_DIR="/data/adb/modules/Surfing"
+LOG_FILE="${LOG_DIR}/linkclear.log"
+PID_FILE="${LOG_DIR}/linkclear.pid"
+CONFIG_FILE="${SCRIPTS_DIR}/box.config"
+
+mkdir -p "$LOG_DIR"
+echo $$ > "$PID_FILE"
+
+log() {
+    echo "[$(date '+%F %T')] $*" >> "$LOG_FILE"
+}
+
+cleanup() {
+    [ -f "$PID_FILE" ] && rm -f "$PID_FILE"
+    exit 0
+}
+trap cleanup TERM INT EXIT
+
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+fi
+
+INTERVAL_ENABLED=$(echo "$interval_enabled" | tr -d '"')
+INTERVAL_RAW=$(echo "$clean_interval" | tr -d '"')
+
+[ "$INTERVAL_ENABLED" != "true" ] && cleanup
+
+parse_interval() {
+    raw=$(echo "$1" | tr -d '[:space:]')
+    [ -z "$raw" ] && echo 43200 && return
+    unit=${raw: -1}
+    value=${raw%[smhdSMHD]}
+    case "$unit" in
+        s|S) echo "$value" ;;
+        m|M) echo $((value * 60)) ;;
+        h|H) echo $((value * 3600)) ;;
+        d|D) echo $((value * 86400)) ;;
+        *) echo "$raw" ;;
+    esac
+}
+
+INTERVAL=$(parse_interval "$INTERVAL_RAW")
+
+while true; do
+    curl -s -X DELETE http://127.0.0.1:9090/connections >/dev/null 2>&1
+    START_TIME=$(date +%s)
+    while true; do
+        sleep 5
+        [ ! -f "$PID_FILE" ] && cleanup
+        NOW=$(date +%s)
+        ELAPSED=$((NOW - START_TIME))
+        [ $ELAPSED -ge $INTERVAL ] && break
+    done
+done
