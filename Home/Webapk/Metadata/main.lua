@@ -243,7 +243,8 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
                     local asn = obj.optInt("asn", 0)
                     local ipV4 = obj.optString("ip", "获取失败...")
             
-                    addStyledText("\n" .. timezone, 14, 0xFF444444)
+                    addStyledText("\nAPI ip.sb", 14, 0xFF444444)
+                    addStyledText(timezone, 14, 0xFF444444)
                     addStyledText(isp, 14, 0xFF444444)
                     addStyledText("ASN: " .. asn, 14, 0xFF444444)
                     addStyledText("IPv4: " .. ipV4, 14, 0xFF444444)
