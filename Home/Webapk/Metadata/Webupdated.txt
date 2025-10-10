@@ -1,7 +1,12 @@
-推送版本号: v6.4.6
+推送版本号: v6.4.7
 
 更新日志: {
 更新内容：
+v6.4.7
+1、优化已知问题...
+2、支持启动时自动检查并更新核心
+备用下载链接: https://cdn.jsdelivr.net/gh/MoGuangYu/Surfing@rm/Home/Webapk/Version/Web_6.4.7_release.apk
+
 v6.4.6
 1、优化已知问题...
 备用下载链接: https://cdn.jsdelivr.net/gh/MoGuangYu/Surfing@rm/Home/Webapk/Version/Web_6.4.6_release.apk
