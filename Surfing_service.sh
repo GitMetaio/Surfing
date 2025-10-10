@@ -5,6 +5,8 @@ modules_dir="/data/adb/modules/Surfing"
 
 SCRIPTS_DIR="/data/adb/box_bll/scripts"
 
+find "$modules_dir" -type f -name "*.pid" -exec rm -f {} \; 2>/dev/null
+
 (
 until [ "$(getprop sys.boot_completed)" -eq 1 ]; do
   sleep 3
