@@ -57,16 +57,16 @@ p: &p
 A: &A
   filter: "^(?!.*(套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|失联|余额)).*$"
   use:
-  - 1.主要地址
-  - 2.备用地址
-  - 3.额外地址
+  - sub1
+  - sub2
+  - sub3
 
 All: &All
   type: url-test
   use:
-  - 1.主要地址
-  - 2.备用地址
-  - 3.额外地址
+  - sub1
+  - sub2
+  - sub3
 
 All_smart: &All_smart
   type: smart
@@ -81,25 +81,25 @@ All_smart: &All_smart
   - 3.额外地址
 
 proxy-providers: # ← 此函数位置请勿变动！此为模块更新时备份恢复订阅变量范围 ↓
-  1.主要地址: # 如遇订阅加载不出来，请尝试切换ua
+  sub1: # 如遇订阅加载不出来，请尝试切换ua
     <<: *p
     override:
-      additional-prefix: "Main："
-    path: ./proxies/1.主要地址.yaml
+      additional-prefix: "sub1："
+    path: ./proxies/sub1.yaml
     url: "此处引入您的Clash订阅链接地址"
 
-  2.备用地址:
+  sub2:
     <<: *p
     override:
-      additional-prefix: "Minor："
-    path: ./proxies/2.备用地址.yaml
+      additional-prefix: "sub2："
+    path: ./proxies/sub2.yaml
     url: "此处引入您的Clash订阅链接地址"
 
-  3.额外地址:
+  sub3:
     <<: *p
     override:
-      additional-prefix: "Additi："
-    path: ./proxies/3.额外地址.yaml
+      additional-prefix: "sub3："
+    path: ./proxies/sub3.yaml
     url: "此处引入您的Clash订阅链接地址"
 
 # —————————
