@@ -175,22 +175,22 @@ dns:
     - "+.xtracloud.net"
     - "+.market.xiaomi.com"
   direct-nameserver:
-    - https://doh.pub/dns-query#🌐 本地·直接连接&h3=false
-    - https://dns.alidns.com/dns-query#🌐 本地·直接连接&h3=true
+    - https://doh.pub/dns-query#🌐 本机·本地直连&h3=false
+    - https://dns.alidns.com/dns-query#🌐 本机·本地直连&h3=true
   proxy-server-nameserver:
-    - https://doh.pub/dns-query#🌐 本地·直接连接&h3=false
-    - https://dns.alidns.com/dns-query#🌐 本地·直接连接&h3=true
+    - https://doh.pub/dns-query#🌐 本机·本地直连&h3=false
+    - https://dns.alidns.com/dns-query#🌐 本机·本地直连&h3=true
   nameserver-policy:
     "RULE-SET:CN_域,Microsoft_域,Apple_域":
-       - https://doh.pub/dns-query#🌐 本地·直接连接&h3=false
-       - https://dns.alidns.com/dns-query#🌐 本地·直接连接&h3=true
+       - https://doh.pub/dns-query#🌐 本机·本地直连&h3=false
+       - https://dns.alidns.com/dns-query#🌐 本机·本地直连&h3=true
   nameserver:
     - https://dns.google/dns-query#DNS连接&h3=true
     - https://cloudflare-dns.com/dns-query#DNS连接&h3=true
 # —————————
 
 proxies:
-  - {name: 🌐 本地·直接连接, type: direct, udp: true}
+  - {name: 🌐 本机·本地直连, type: direct, udp: true}
   - {name: ⛔️ 禁止·拒绝连接, type: reject}
   - {name: 🌐 DNS_Hijack, type: dns}
 
@@ -214,12 +214,12 @@ proxy_groups: &proxy_groups
       - 传统·其它地区
       - 智能·其它地区
       - ⛔️ 禁止·拒绝连接
-      - 🌐 本地·直接连接
+      - 🌐 本机·本地直连
     <<: *A
 CNproxy_groups: &CNproxy_groups
     type: select
     proxies:
-      - 🌐 本地·直接连接
+      - 🌐 本机·本地直连
       - ⛔️ 禁止·拒绝连接
       - 总模式
       - ALL·延迟最低
@@ -261,13 +261,13 @@ proxy-groups:
       - 传统·其它地区
       - 智能·其它地区
       - ⛔️ 禁止·拒绝连接
-      - 🌐 本地·直接连接
+      - 🌐 本机·本地直连
 
   - name: 订阅更新
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Update.svg"
     type: select
     proxies:
-      - 🌐 本地·直接连接
+      - 🌐 本机·本地直连
       - 总模式
 
   - name: 小红书
@@ -442,6 +442,13 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Globe.svg"
     filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch)).*$"
     <<: *All_smart
+    
+  - name: 特殊地址
+    icon: "https://cdn.jsdelivr.net/gh/MoGuangYu/Surfing@rm/Home/icon/User.svg"
+    type: select
+    proxies:
+      - 🌐 本机·本地直连
+      - ⛔️ 禁止·拒绝连接
 # —————————
 
 rule-anchor:
@@ -458,6 +465,10 @@ rule-anchor:
 # 部分规则上游为https://github.com/blackmatrix7/ios_rule_script
 # Github Actions 每日自动同步跟随更新
 rule-providers:
+  自定义规则: # 主要用于广告误杀自定义放行
+    <<: *Local
+    path: ./etc/自定义规则.list # 请按路径新建文件及建立你需要的规则
+
   WebRTC_端/域:
     <<: *Classical
     path: ./rules/WebRTC.list
@@ -625,6 +636,8 @@ rules:
   - DST-PORT,53,🌐 DNS_Hijack
   - DST-PORT,853,DNS连接
 
+  - RULE-SET,自定义规则,特殊地址
+
   - RULE-SET,WebRTC_端/域,WebRTC
   - RULE-SET,No-ads-all_域,广告拦截
 
@@ -677,11 +690,11 @@ rules:
   - RULE-SET,Telegram_域,Telegram
   - RULE-SET,Telegram_IP,Telegram,no-resolve
 
-  - RULE-SET,Private_域,🌐 本地·直接连接
-  - RULE-SET,Private_IP,🌐 本地·直接连接,no-resolve
+  - RULE-SET,Private_域,🌐 本机·本地直连
+  - RULE-SET,Private_IP,🌐 本机·本地直连,no-resolve
 
-  - RULE-SET,CN_域,🌐 本地·直接连接
-  - RULE-SET,CN_IP,🌐 本地·直接连接
+  - RULE-SET,CN_域,🌐 本机·本地直连
+  - RULE-SET,CN_IP,🌐 本机·本地直连
 
   - MATCH,漏网之鱼
 # —————————
