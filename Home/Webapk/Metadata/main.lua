@@ -261,7 +261,7 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
                             end
                         end
                         addStyledText(ipV6Text, 14, 0xFF444444)
-                        addStyledText("\n@Surfing Webbrowser 2023.", 16, 0xFF444444)
+                        addStyledText("\n@Surfing Web.apk 2023.", 16, 0xFF444444)
                     end)
                 end
             end)
