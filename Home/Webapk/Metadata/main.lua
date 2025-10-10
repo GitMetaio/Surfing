@@ -235,7 +235,7 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
               dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setAllCaps(false)
             
             
-              Http.get("https://api.ip.sb/geoip", nil, "UTF-8", headers, function(geoCode, geoContent)
+              Http.get("https://api-ipv4.ip.sb/geoip", nil, "UTF-8", headers, function(geoCode, geoContent)
                 if geoCode == 200 and geoContent then
                   local obj = JSONObject(geoContent)
                   local timezone = obj.optString("timezone", "获取失败...")
@@ -248,11 +248,13 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
                   addStyledText("ASN: " .. asn, 14, 0xFF444444)
                   addStyledText("IPv4: " .. ip, 14, 0xFF444444)
             
-                  Http.get("https://api-ipv6.ip.sb/ip", nil, "UTF-8", headers, function(ipv6Code, ipv6Content)
+                Http.get("https://api-ipv6.ip.sb/geoip", nil, "UTF-8", headers, function(ipv6Code, ipv6Content)
                     if ipv6Code == 200 and ipv6Content and ipv6Content:match("%S") then
-                      addStyledText("IPv6: " .. ipv6Content:gsub("%s+", ""), 14, 0xFF444444)
+                        local objV6 = JSONObject(ipv6Content)
+                        local ipV6 = objV6.optString("ip", "获取失败...")
+                        addStyledText("IPv6: " .. ipV6, 14, 0xFF444444)
                     end
-                    addStyledText("\n@Surfing Webbrowser 2023.", 16, 0xFF444444)
+                      addStyledText("\n@Surfing Webbrowser 2023.", 16, 0xFF444444)
                   end)
                 end
               end)
