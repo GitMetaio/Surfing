@@ -261,7 +261,39 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
                             end
                         end
                         addStyledText(ipV6Text, 14, 0xFF444444)
-                        addStyledText("\n@Surfing Web.apk 2023.", 16, 0xFF444444)
+                        local peakTriggered = false
+                        local peakExpireTime = 0
+                        local peakBaseCount = 0
+            
+                        function getOnlineCount()
+                            local hour = tonumber(os.date("%H"))
+                            local now = os.time()
+                            if hour >= 18 and hour <= 24 then
+                                if peakTriggered and now < peakExpireTime then
+                                    local fluctuation = peakBaseCount * (math.random(10,20)/100)
+                                    return math.floor(peakBaseCount + math.random(-fluctuation, fluctuation))
+                                end
+                                if math.random() <= 0.65 then
+                                    peakTriggered = true
+                                    peakExpireTime = now + math.random(10,20)*60
+                                    peakBaseCount = math.random(2000, 5000)
+                                    local fluctuation = peakBaseCount * (math.random(10,20)/100)
+                                    return math.floor(peakBaseCount + math.random(-fluctuation, fluctuation))
+                                else
+                                    return math.random(500, 1500)
+                                end
+                            elseif hour >= 12 and hour < 18 then
+                                return math.random(800, 2000)
+                            elseif hour >= 6 and hour < 12 then
+                                return math.random(300, 800)
+                            else
+                                return math.random(50, 300)
+                            end
+                        end
+            
+                        local onlineCount = getOnlineCount()
+                        addStyledText("\n😊当前在线 " .. onlineCount .. " 人", 14, 0xFF444444)
+                        addStyledText("@Surfing Web.apk 2023.", 16, 0xFF444444)
                     end)
                 end
             end)
