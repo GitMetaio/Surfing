@@ -193,7 +193,6 @@ if [ -d /data/adb/box_bll ]; then
   cp /data/adb/box_bll/scripts/box.config /data/adb/box_bll/scripts/box.config.bak
   cp -f "$MODPATH/box_bll/clash/config.yaml" /data/adb/box_bll/clash/
   cp -f "$MODPATH/box_bll/clash/Toolbox.sh" /data/adb/box_bll/clash/
-  cp -f "$MODPATH/box_bll/clash/Model.bin" /data/adb/box_bll/clash/
   cp -f "$MODPATH/box_bll/bin/clash" /data/adb/box_bll/bin/
   
   if [ "$COPY_WEB" = true ]; then
@@ -215,8 +214,9 @@ if [ -d /data/adb/box_bll ]; then
   nohup inotifyd "${SCRIPTS_PATH}/ctr.inotify" "$CTR_PATH" > /dev/null 2>&1 &
   sleep 1
   cp -f "$MODPATH/box_bll/clash/etc/hosts" /data/adb/box_bll/clash/etc/
-  rm -rf /data/adb/box_bll/mihomo
-  rm -rf /data/adb/box_bll/panel
+  rm -rf /data/adb/box_bll/clash/Model.bin
+  rm -rf /data/adb/box_bll/clash/smart_weight_data.csv
+  rm -rf /data/adb/box_bll/scripts/box.upgrade
   rm -rf "$MODPATH/box_bll"
 
   if choose_volume_key; then
