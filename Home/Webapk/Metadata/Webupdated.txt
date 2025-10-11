@@ -1,7 +1,11 @@
-推送版本号: v6.4.7
+推送版本号: v6.4.8
 
 更新日志: {
 更新内容：
+v6.4.8
+1、支持启动时自动检查更新lgbm模型
+备用下载链接: https://cdn.jsdelivr.net/gh/MoGuangYu/Surfing@rm/Home/Webapk/Version/Web_6.4.8_release.apk
+
 v6.4.7
 1、优化已知问题...
 2、支持启动时自动检查并更新核心
