@@ -164,7 +164,12 @@ stop_redirect() {
   ${iptables} -t nat -X LOCAL_IP_V4
 }
 
-start_tproxy() {  
+start_tproxy() {
+  ip -6 rule del fwmark ${mark_id} table ${table_id} pref ${table_id} 2>/dev/null || true
+  ip rule del fwmark ${mark_id} table ${table_id} pref ${table_id} 2>/dev/null || true
+  ip -6 route flush table ${table_id} 2>/dev/null || true
+  ip route flush table ${table_id} 2>/dev/null || true
+
   if [ "${iptables}" = "ip6tables -w 100" ] ; then  
     ip -6 rule add fwmark ${mark_id} table ${table_id} pref ${table_id}  
     ip -6 route add local default dev lo table ${table_id}  
@@ -286,10 +291,10 @@ start_tproxy() {
       for appid in ${uid_list[@]} ; do  
         ${iptables} -t mangle -A BOX_LOCAL -m owner --uid-owner ${appid} -j RETURN  
         ${iptables} -t mangle -I BOX_LOCAL 1 -m owner --uid-owner ${appid} -j RETURN
-        ${iptables} -t nat -I BOX_LOCAL 1 -m owner --uid-owner ${appid} -j RETURN 2>/dev/null || true
+        ${iptables} -t nat -I BOX_LOCAL 1 -m owner --uid-owner ${appid} -j RETURN
         
         ${iptables} -t mangle -I BOX_LOCAL 1 -p udp --dport 443 -m owner --uid-owner ${appid} -j RETURN
-        ${iptables} -t nat -I BOX_LOCAL 1 -p udp --dport 443 -m owner --uid-owner ${appid} -j RETURN 2>/dev/null || true
+        ${iptables} -t nat -I BOX_LOCAL 1 -p udp --dport 443 -m owner --uid-owner ${appid} -j RETURN
       done  
       # 允许 !app  
       ${iptables} -t mangle -A BOX_LOCAL -p tcp -j MARK --set-xmark ${mark_id}  
@@ -384,7 +389,12 @@ start_tproxy() {
   #ip6tables -w 100 -t nat -A PREROUTING -d ${fake_ip_range_v6} -p icmp -j DNAT --to-destination ::1  
 }  
   
-stop_tproxy() {  
+stop_tproxy() {
+  ip -6 rule del fwmark ${mark_id} table ${table_id} pref ${table_id}
+  ip rule del fwmark ${mark_id} table ${table_id} pref ${table_id}
+  ip -6 route flush table ${table_id}
+  ip route flush table ${table_id}
+  
   ip -6 rule del fwmark ${mark_id} table ${table_id} pref ${table_id}  
   ip -6 route flush table ${table_id}  
   ip rule del fwmark ${mark_id} table ${table_id} pref ${table_id}  
@@ -412,7 +422,16 @@ stop_tproxy() {
   
   ${iptables} -t mangle -F DIVERT  
   ${iptables} -t mangle -X DIVERT  
-  
+
+
+  if [ "${iptables}" = "ip6tables -w 100" ] ; then
+    ip -6 rule add fwmark ${mark_id} table ${table_id} pref ${table_id}
+    ip -6 route add local default dev lo table ${table_id}
+  else
+    ip rule add fwmark ${mark_id} table ${table_id} pref ${table_id}
+    ip route add local default dev lo table ${table_id}
+  fi
+
   if [ "${iptables}" = "ip6tables -w 100" ] ; then  
     ${iptables} -D OUTPUT -d ::1 -p tcp -m owner --uid-owner ${box_user} --gid-owner ${box_group} -m tcp --dport ${tproxy_port} -j REJECT  
     ${iptables} -D OUTPUT -d ::1 -p tcp -m owner --uid-owner 0 --gid-owner 3005 -m tcp --dport ${tproxy_port} -j REJECT  
@@ -420,6 +439,9 @@ stop_tproxy() {
     ${iptables} -D OUTPUT -d 127.0.0.1 -p tcp -m owner --uid-owner ${box_user} --gid-owner ${box_group} -m tcp --dport ${tproxy_port} -j REJECT  
     ${iptables} -D OUTPUT -d 127.0.0.1 -p tcp -m owner --uid-owner 0 --gid-owner 3005 -m tcp --dport ${tproxy_port} -j REJECT  
   fi  
+  
+  ${iptables} -t nat -F BOX_LOCAL
+  ${iptables} -t nat -X BOX_LOCAL
   
   # android ip6tablses 没有nat表  
   iptables="iptables -w 100"  
