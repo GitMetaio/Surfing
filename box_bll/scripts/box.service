@@ -320,6 +320,7 @@ case "$1" in
     display_bin_status || start_service
     if [ $? -eq 0 ]; then
       uptime_sec=$(cut -d. -f1 /proc/uptime)
+      uptime_sec=${uptime_sec:-0}
       if [ "$uptime_sec" -lt 180 ]; then
         log Info "系统已重启，正在等待服务初始化..."
         sleep 5
