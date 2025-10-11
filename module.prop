@@ -1,7 +1,7 @@
 id=Surfing
 name=Surfing
-version=v7.5.8
-versionCode=1634
+version=v7.5.9
+versionCode=1635
 author=GitMetaio
 description=This project is a Magisk 、 Kernelsu and APatch module for Clash, sing-box, v2ray, and xray, hysteria. It supports REDIRECT (TCP only), TPROXY (TCP + UDP) transparent proxy, TUN (TCP + UDP), and a mixed mode proxy with REDIRECT (TCP) + TUN (UDP).实现安卓软路由
 updateJson=https://raw.githubusercontent.com/MoGuangYu/Surfing/main/Surfing.json
