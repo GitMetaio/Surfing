@@ -285,6 +285,11 @@ start_tproxy() {
       # 绕过应用  
       for appid in ${uid_list[@]} ; do  
         ${iptables} -t mangle -A BOX_LOCAL -m owner --uid-owner ${appid} -j RETURN  
+        ${iptables} -t mangle -I BOX_LOCAL 1 -m owner --uid-owner ${appid} -j RETURN
+        ${iptables} -t nat -I BOX_LOCAL 1 -m owner --uid-owner ${appid} -j RETURN 2>/dev/null || true
+        
+        ${iptables} -t mangle -I BOX_LOCAL 1 -p udp --dport 443 -m owner --uid-owner ${appid} -j RETURN
+        ${iptables} -t nat -I BOX_LOCAL 1 -p udp --dport 443 -m owner --uid-owner ${appid} -j RETURN 2>/dev/null || true
       done  
       # 允许 !app  
       ${iptables} -t mangle -A BOX_LOCAL -p tcp -j MARK --set-xmark ${mark_id}  
