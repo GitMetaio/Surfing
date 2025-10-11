@@ -68,18 +68,6 @@ All: &All
   - 2.备用地址
   - 3.额外地址
 
-All_smart: &All_smart
-  type: smart
-  policy-priority: "香港:1.4;HK:1.4;美国:1.0;US:1.0;新加坡:1.2;SG:1.2"
-  uselightgbm: true
-  collectdata: true
-  strategy: sticky-sessions
-  include-all: true
-  use:
-  - 1.主要地址
-  - 2.备用地址
-  - 3.额外地址
-
 proxy-providers: # ← 此函数位置请勿变动！此为模块更新时备份恢复订阅变量范围 ↓
   1.主要地址: # 如遇订阅加载不出来，请尝试切换ua
     <<: *p
@@ -142,7 +130,7 @@ tun:
   strict-route: true
   auto-redirect: false
   auto-detect-interface: true
-  exclude-package:
+  exclude-package: # 如黑白名单这里需排除
     - com.tencent.mm
     - com.tencent.mobileqq
     # _____________________# 三星专供 ↓ 范围
@@ -169,11 +157,11 @@ dns:
   enhanced-mode: fake-ip
   fake-ip-range: 172.20.0.1/16
   fake-ip-filter:
+    - "RULE-SET:CN_域"
     - "RULE-SET:Private_域"
     - "RULE-SET:GoogleFCM_域"
     - "+.3gppnetwork.org"
     - "+.xtracloud.net"
-    - "+.market.xiaomi.com"
   direct-nameserver:
     - https://doh.pub/dns-query#🌐 本机·本地直连&h3=false
     - https://dns.alidns.com/dns-query#🌐 本机·本地直连&h3=true
@@ -201,42 +189,14 @@ proxy_groups: &proxy_groups
       - ALL·延迟最低
       - ALL·故障转移
       - ALL·负载均衡
-      - 传统·香港地区
-      - 智能·香港地区
-      - 传统·中国台湾
-      - 智能·中国台湾
-      - 传统·狮城地区
-      - 智能·狮城地区
-      - 传统·日本地区
-      - 智能·日本地区
-      - 传统·美国地区
-      - 智能·美国地区
-      - 传统·其它地区
-      - 智能·其它地区
+      - ALL·香港地区
+      - ALL·中国台湾
+      - ALL·狮城地区
+      - ALL·日本地区
+      - ALL·美国地区
+      - ALL·其它地区
       - ⛔️ 禁止·拒绝连接
       - 🌐 本机·本地直连
-    <<: *A
-CNproxy_groups: &CNproxy_groups
-    type: select
-    proxies:
-      - 🌐 本机·本地直连
-      - ⛔️ 禁止·拒绝连接
-      - 总模式
-      - ALL·延迟最低
-      - ALL·故障转移
-      - ALL·负载均衡
-      - 传统·香港地区
-      - 智能·香港地区
-      - 传统·中国台湾
-      - 智能·中国台湾
-      - 传统·狮城地区
-      - 智能·狮城地区
-      - 传统·日本地区
-      - 智能·日本地区
-      - 传统·美国地区 
-      - 智能·美国地区
-      - 传统·其它地区
-      - 智能·其它地区
     <<: *A
 # —————————
 proxy-groups:
@@ -247,20 +207,12 @@ proxy-groups:
       - ALL·延迟最低
       - ALL·负载均衡
       - ALL·故障转移
-      - 智能调度 / ALL
-      - 传统·香港地区
-      - 智能·香港地区
-      - 传统·中国台湾
-      - 智能·中国台湾
-      - 传统·狮城地区
-      - 智能·狮城地区
-      - 传统·日本地区
-      - 智能·日本地区
-      - 传统·美国地区
-      - 智能·美国地区
-      - 传统·其它地区
-      - 智能·其它地区
-      - ⛔️ 禁止·拒绝连接
+      - ALL·香港地区  
+      - ALL·中国台湾
+      - ALL·狮城地区
+      - ALL·日本地区
+      - ALL·美国地区
+      - ALL·其它地区
       - 🌐 本机·本地直连
 
   - name: 订阅更新
@@ -384,71 +336,45 @@ proxy-groups:
     strategy: round-robin
     <<: *A
 
-  - name: 智能调度 / ALL
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Ai.svg"
-    filter: "^(?!.*(套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|失联|余额|拒绝|DNS|Ch)).*$"
-    <<: *All_smart
-
-  - name: 传统·香港地区
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
-    filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
-    <<: *All
-  - name: 智能·香港地区
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
-    filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
-    <<: *All_smart
-
-  - name: 传统·中国台湾
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
-    filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
-    <<: *All
-  - name: 智能·中国台湾
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
-    filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
-    <<: *All_smart
-
-  - name: 传统·日本地区
+  - name: ALL·日本地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/JP.svg"
     filter: "^(?=.*(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan)).*$"
     <<: *All
-  - name: 智能·日本地区
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/JP.svg"
-    filter: "^(?=.*(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan)).*$"
-    <<: *All_smart
 
-  - name: 传统·美国地区
+  - name: ALL·中国台湾
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
+    filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
+    <<: *All
+
+  - name: ALL·香港地区
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
+    filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
+    <<: *All
+
+  - name: ALL·美国地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/US.svg"
     filter: "^(?=.*(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States)).*$"
     <<: *All
-  - name: 智能·美国地区
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/US.svg"
-    filter: "^(?=.*(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States)).*$"
-    <<: *All_smart
 
-  - name: 传统·狮城地区
+  - name: ALL·狮城地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Singapore.svg"
     filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"
     <<: *All
-  - name: 智能·狮城地区
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Singapore.svg"
-    filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"
-    <<: *All_smart
 
-  - name: 传统·其它地区
+  - name: ALL·其它地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Globe.svg"
-    filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch)).*$"
+    filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch|网址|售|防失)).*$"
     <<: *All
-  - name: 智能·其它地区
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Globe.svg"
-    filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch)).*$"
-    <<: *All_smart
-    
+
   - name: 特殊地址
     icon: "https://cdn.jsdelivr.net/gh/MoGuangYu/Surfing@rm/Home/icon/User.svg"
     type: select
+    url: https://www.baidu.com/favicon.ico
+    interval: 86400
     proxies:
       - 🌐 本机·本地直连
       - ⛔️ 禁止·拒绝连接
+
 # —————————
 
 rule-anchor:
