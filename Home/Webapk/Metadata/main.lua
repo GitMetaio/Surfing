@@ -264,31 +264,51 @@ Http.get(url2 .. "?t=" .. os.time(), nil, "UTF-8", headers, function(code, conte
                         local peakTriggered = false
                         local peakExpireTime = 0
                         local peakBaseCount = 0
-            
+                        
+                        
+                        local lastOnlineCount = nil
+                        local lastUpdateTime = 0
                         function getOnlineCount()
                             local hour = tonumber(os.date("%H"))
                             local now = os.time()
-                            if hour >= 18 and hour <= 24 then
-                                if peakTriggered and now < peakExpireTime then
-                                    local fluctuation = peakBaseCount * (math.random(10,20)/100)
-                                    return math.floor(peakBaseCount + math.random(-fluctuation, fluctuation))
+                        
+                            local ranges = {
+                                {0, 6, 50, 300},
+                                {6, 12, 300, 800},
+                                {12, 18, 800, 2000},
+                                {18, 24, 2000, 5000},
+                            }
+                        
+                            local minCount, maxCount
+                            for _, r in ipairs(ranges) do
+                                if hour >= r[1] and hour < r[2] then
+                                    minCount, maxCount = r[3], r[4]
+                                    break
                                 end
-                                if math.random() <= 0.65 then
-                                    peakTriggered = true
-                                    peakExpireTime = now + math.random(10,20)*60
-                                    peakBaseCount = math.random(2000, 5000)
-                                    local fluctuation = peakBaseCount * (math.random(10,20)/100)
-                                    return math.floor(peakBaseCount + math.random(-fluctuation, fluctuation))
-                                else
-                                    return math.random(500, 1500)
-                                end
-                            elseif hour >= 12 and hour < 18 then
-                                return math.random(800, 2000)
-                            elseif hour >= 6 and hour < 12 then
-                                return math.random(300, 800)
-                            else
-                                return math.random(50, 300)
                             end
+                        
+                            if not lastOnlineCount then
+                                lastOnlineCount = math.random(minCount, maxCount)
+                                lastUpdateTime = now
+                                return lastOnlineCount
+                            end
+                        
+                            local delta = now - lastUpdateTime
+                        
+                            if delta < math.random(5, 15) then
+                                return lastOnlineCount
+                            end
+                        
+                            local changePercent = math.random(-5, 5) / 100
+                            local newCount = math.floor(lastOnlineCount * (1 + changePercent))
+                        
+                            if newCount < minCount then newCount = minCount end
+                            if newCount > maxCount then newCount = maxCount end
+                        
+                            lastOnlineCount = newCount
+                            lastUpdateTime = now
+                        
+                            return newCount
                         end
             
                         local onlineCount = getOnlineCount()
