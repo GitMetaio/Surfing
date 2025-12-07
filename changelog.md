@@ -1,5 +1,61 @@
+# v7.6.0
+### 📦 Debug
+  - 移除：`Smart` 内核 缺乏未知稳定性
+  - 移除：检查内核更新 `scripts` 功能冗余
+  - 优化：`linkclear` task 进程 `sleep` 睡死
+  - 优化：进程管理 `scripts` 更好的启停交互
+  - 修复：调用 `which` 可能查找失败导致的错误
+  - 修复：HyperOS 3 下的 SSID 解析错误 [#253](https://github.com/GitMetaio/Surfing/pull/253) by @zx900930
+  - 其它：已解决待机发热及 CPU 异常问题
+  - ~~更新：关于  `scripts` config 配置动态调整~~
+  - ~~即下个版本起 不会覆盖你们的配置~~
+  - 现在仍需通过手动进行合并，此次更新建议重启
+> 如有疑问，欢迎加入我们的群组。
+
+# v7.5.9
+### 👨‍🔧 Debug
+  - 修复: 黑白名单失效
+  - TUN 需排除相应包名
+  - `fake-ip、ipv6` 不受影响
+  - 流量即可不通过核心
+  - 同步: Web App 支持启动更新 `lgbm`模型
+
+# v7.5.8
+### 👨‍🔧 Version update
+  - 恢复白名单策略 > 特殊地址
+  - 修正 `direct`(直连) 的命名 更好的辨识度
+  - 分支同步 Web.apk 支持启动自动更新核心版本
+  - 同步当前最新分支，可能会长期停更一段时间
+
+# v7.5.7
+### 👨‍🔧 Debug   
+  - **支持**: 自动更新内核 需在 `box.config` 配置开启
+  - **修复**: `Another app is currently holding the xtables lock. Perhaps you want to use the -w option?  
+` `iptables` 锁可能导致的冲突？命令执行失败 使用 `-w` 变量  
+  - **修复**: `CUP` 及内存占用异常，设备发热问题
+  - **进程管理优化**：独立 `PID` 文件管理，优雅退出 `trap` 防止残留多个僵尸实例 `sleep`  
+  -  `sleep` 可被 `kill` 打断，安全退出
+
+### 🛠️ Config  
+  - **支持** **传统 / 智能(smart)** 策略
+  - **移除** 电流/功耗 监测
+  - 整体优化了一下 
+
+# v7.5.6
+### ✅️ Smart 智能调度 (LightGBM 模型) 支持
+  - 自动学习节点连接历史（成功率 / 延迟 / ASN / 地理分布等特征)，动态计算权重  `[Smart] Status: [closed], Updated weights: (Model: [LightGBM], TCP: [0.5649], ...)`
+  - 支持 **policy-priority** 策略，自定义地区偏好（如 `HK:1.4; JP:1.3; SG:1.2; US:1.1; TW:1.0; Premium:0.9`）
+- 智能调度所需数据会保存到 `smart_weight_data.csv`用于分析及[模型训练](https://github.com/vernesong/mihomo/blob/Alpha/component/smart/lightgbm/transform.go#L13)
+- 自动跳过不可用节点（失败率高 / 无法握手）
+- 与 **sticky-sessions** 策略配合使用时，能在优选节点后保持稳定连接，提升整体稳定性。
+
+### 祝大家节日快乐！🎉
+### 📌 Tips
+首次使用需积累一定样本量  
+随着运行时间增长，调度效果会逐步提升。
+
 # v7.5.5
-## Debug：电流统计异常偏低
+### Debug：电流统计异常偏低
 在长时间运行等高负载任务时，生成的电流统计报告中显示的累计电量（mAh）远低于预期，平均电流计算错误，甚至出现负值
 
 > 原始累加逻辑溢出导致数值偏小，本次版本已全面改用 awk 高精度累积，统计结果更加精准可靠
@@ -13,7 +69,7 @@
   <p>运行报告图示：</p>
   <img src="https://raw.githubusercontent.com/GitMetaio/Surfing/rm/Home/file/image/1.jpg" alt="运行图示" width="50%">
 
-## 其它:
+### 其它:
 - 优化电流采集判定
 - 改进充放电状态判断
 - 优化推算可信度判断
@@ -30,7 +86,7 @@ Shell 默认使用 32 位整数，在累计 μAh 级电量时极易溢出 `3A ×
 ✅ *已验证可信度接近99%*
 
 # v7.5.4
-## 👨‍🔧 功耗监测_Debug
+### 👨‍🔧 功耗监测_Debug
 - 适配部分设备支持反转电流判断
 - 支持控制 **wakelock** 休眠锁
 - 提升稳定性，以及更精准的计量...
@@ -45,7 +101,7 @@ Shell 默认使用 32 位整数，在累计 μAh 级电量时极易溢出 `3A ×
 - 遇事不决先重启，其它调整...
 
 # v7.5.2
-## 👨‍🔧 继上版重新发布:
+### 👨‍🔧 继上版重新发布:
 - ~~卸载子模块的挂载，不代表磁贴 **App** 被移除~~
 - 卸载子模块有可能会导致磁贴失效,请勿卸载
 - 通过音量键选择是否挂载 **System hosts** 文件
@@ -59,7 +115,7 @@ Shell 默认使用 32 位整数，在累计 μAh 级电量时极易溢出 `3A ×
 - 关闭 **Tun** ~~注意关闭后无法拦截 **RTC**~~
 
 # v7.4.9
-## 👨‍🔧 重大更新
+### 👨‍🔧 重大更新
 - 时隔两年半⛹🏻‍♂️，彻底解决 **Wan0 IPv6** 所带来的 **DNS** 泄露/污染抢答
 - 不在乎 **WebRTC** 泄露，可关闭网卡模块以带来更好的体验，看个人 `可选`
 - 支持向状态栏添加服务开关磁贴，请勿修改9090端口。由于暂未 **GitHub** 进行开源构建，如您担心隐私安全，可在更新后进行卸载子模块并 `su -c "pm uninstall com.yadli.surfingtile"`即可 **源码** | [下载](https://raw.githubusercontent.com/MoGuangYu/Surfing/main/folder/SurfingTile.tar.gz) `可选`
@@ -143,12 +199,12 @@ Shell 默认使用 32 位整数，在累计 μAh 级电量时极易溢出 `3A ×
 - 优化部分脚本运行逻辑，及配置更新...
 
 # v7.3.8
-## 👨‍🔧 兼容性优化
+### 👨‍🔧 兼容性优化
 - 支持不同 Android Shell 环境（sh、ash、bash）
 - 适配 Android Toybox / BusyBox 版本
 - 优化了系统命令路径检测，支持更多设备环境
 
-## ✅ Debug(修复)
+### ✅ Debug(修复)
 1. 优化已知问题...
 2. 提示稳定性
 
@@ -168,7 +224,7 @@ Shell 默认使用 32 位整数，在累计 μAh 级电量时极易溢出 `3A ×
 - 增强dns劫持的能力
 - 解决更新所残留的旧 inotify进程
 
-## 🧰 Toolbox
+### 🧰 Toolbox
 
 - 优化bug、逻辑及没什么卵用的功能🤷‍♂️
 - 早期某些版本可能获取不到更新，可通过此包获取最新 `v13.3.5`

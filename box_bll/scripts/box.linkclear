@@ -1,0 +1,53 @@
+#!/system/bin/sh
+
+SCRIPTS_DIR=$(dirname "$(realpath "$0")")
+LOG_DIR="/data/adb/box_bll/run"
+LOG_FILE="${LOG_DIR}/linkclear.log"
+PID_DIR="/dev/tmp"
+PID_FILE="${PID_DIR}/linkclear.pid"
+SLEEP_PID_FILE="${PID_DIR}/linkclear.sleep.pid"
+BOX_CONFIG="${SCRIPTS_DIR}/box.config"
+CLASH_CONFIG="/data/adb/box_bll/clash/config.yaml"
+
+mkdir -p "$LOG_DIR"
+
+log() {
+    echo "[$(date '+%F %T')] $*" >> "$LOG_FILE"
+}
+
+echo $$ > "$PID_FILE"
+
+[ -f "$BOX_CONFIG" ] && source "$BOX_CONFIG"
+INTERVAL_ENABLED=$(echo "$interval_enabled" | tr -d '"')
+INTERVAL_RAW=$(echo "$clean_interval" | tr -d '"')
+
+[ "$INTERVAL_ENABLED" != "true" ] && { rm -f "$PID_FILE"; exit 0; }
+
+parse_interval() {
+    raw=$(echo "$1" | tr -d '[:space:]')
+    [ -z "$raw" ] && echo 43200 && return
+    unit=${raw: -1}
+    value=${raw%[smhdSMHD]}
+    case "$unit" in
+        s|S) echo "$value" ;;
+        m|M) echo $((value * 60)) ;;
+        h|H) echo $((value * 3600)) ;;
+        d|D) echo $((value * 86400)) ;;
+        *) echo "$raw" ;;
+    esac
+}
+
+INTERVAL=$(parse_interval "$INTERVAL_RAW")
+
+LOCALHOST=${LOCALHOST:-127.0.0.1}
+
+PORT=$(grep -E '^\s*external-controller:' "$CLASH_CONFIG" | awk -F: '{print $NF}' | tr -d ' ')
+
+[ -z "$PORT" ] && PORT=9090
+
+while true; do
+    curl -s -X DELETE "http://${LOCALHOST}:$PORT/connections" >/dev/null 2>&1
+    sleep "$INTERVAL" &
+    echo $! > "$SLEEP_PID_FILE"
+    wait $!
+done

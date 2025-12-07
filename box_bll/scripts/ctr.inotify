@@ -2,14 +2,16 @@
 
 export PATH="/data/adb/magisk:/data/adb/ksu/bin:/data/adb/ap/bin:$PATH:/data/data/com.termux/files/usr/bin"
 
+variab_dir="/dev/tmp/"
 module_dir="/data/adb/modules/Surfing"
 base_dir="/data/adb/box_bll"
-variab_dir="${base_dir}/variab"
-log_file="${base_dir}/run/Networkswitch_debug.log"
-log_file_path="/data/local/tmp/"
-temp_log_file="${log_file_path}debug.log.tmp"
+log_file="${base_dir}/run/Networkswitch.log"
+temp_log_file="${variab_dir}debug.log.tmp"
 last_check_file="${variab_dir}/last_check_time"
 last_wifi_state_file="${variab_dir}/last_wifi_state"
+
+PID_FILE="${variab_dir}/linkclear.pid"
+SLEEP_PID_FILE="${variab_dir}/linkclear.sleep.pid"
 
 log_enabled="true"
 
@@ -46,16 +48,16 @@ log_msg() {
 clean_old_logs() {
     retention_time=$((24 * 60 * 60))
     current_time=$(date +%s)
+
     if [ -f "$log_file" ]; then
-        > "$temp_log_file"
-        while IFS= read -r line; do
-            log_date=$(echo "$line" | awk '{print $1, $2}')
-            log_time=$(date -d "$log_date" +%s 2>/dev/null)
-            if [ $? -eq 0 ] && [ $((current_time - log_time)) -lt "$retention_time" ]; then
-                echo "$line" >> "$temp_log_file"
-            fi
-        done < "$log_file"
-        mv "$temp_log_file" "$log_file"
+        awk -v now="$current_time" -v retention="$retention_time" '
+        {
+            log_date = $1 " " $2
+            cmd = "date -d \"" log_date "\" +%s"
+            cmd | getline log_time
+            close(cmd)
+            if (now - log_time < retention) print
+        }' "$log_file" > "${log_file}.tmp" && mv "${log_file}.tmp" "$log_file"
     fi
 }
 clean_old_logs
@@ -120,6 +122,8 @@ check_module_service() {
                         touch "${module_dir}/disable"
                         log_msg "当前配置：禁用"
                         log_msg "模块服务已禁用"
+                        [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                        [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
                     else
                         log_msg "当前配置：禁用"
                         log_msg "当前服务已是禁用，无需操作"
@@ -134,6 +138,7 @@ check_module_service() {
                                     touch "${module_dir}/disable"
                                     log_msg "当前配置：禁用"
                                     log_msg "已命中列表，模块服务已禁用"
+
                                 else
                                     log_msg "当前配置：禁用"
                                     log_msg "已命中列表，当前模块服务已是禁用，无需操作"
@@ -143,6 +148,9 @@ check_module_service() {
                                     rm "${module_dir}/disable" 2>/dev/null
                                     log_msg "当前配置：启用"
                                     log_msg "未命中列表，模块服务已启用"
+                                    [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                                    [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
+                                    "${scripts_dir}/box.linkclear" >> "${run_path}/run_error.log" 2>&1 &
                                 else
                                     log_msg "当前配置：启用"
                                     log_msg "未命中列表，模块当前已是启用，无需操作"
@@ -156,15 +164,20 @@ check_module_service() {
                                     rm "${module_dir}/disable" 2>/dev/null
                                     log_msg "当前配置：启用"
                                     log_msg "已命中列表，模块服务已启用"
+                                    [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                                    [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
+                                    "${scripts_dir}/box.linkclear" >> "${run_path}/run_error.log" 2>&1 &
                                 else
                                     log_msg "当前配置：启用"
-                                    log_msg "已命中列表，当前模块服务已是启用，无需操作"
+                                    log_msg "已命中列表，模块当前已是启用，无需操作"
                                 fi
                             else
                                 if [ "$current_state" != "disabled" ]; then
                                     touch "${module_dir}/disable"
                                     log_msg "当前配置：禁用"
                                     log_msg "未命中列表，已禁用模块服务"
+                                    [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                                    [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
                                 else
                                     log_msg "当前配置：禁用"
                                     log_msg "未命中列表，模块当前已是禁用，无需操作"
@@ -176,6 +189,9 @@ check_module_service() {
                                 rm "${module_dir}/disable" 2>/dev/null
                                 log_msg "当前配置：启用"
                                 log_msg "模块服务已启用（默认逻辑）"
+                                [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                                [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
+                                "${scripts_dir}/box.linkclear" >> "${run_path}/run_error.log" 2>&1 &
                             else
                                 log_msg "当前配置：启用"
                                 log_msg "模块服务已是启用，无需操作（默认逻辑）"
@@ -187,6 +203,9 @@ check_module_service() {
                             rm "${module_dir}/disable" 2>/dev/null
                             log_msg "当前配置：启用"
                             log_msg "模块服务已启用"
+                            [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                            [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
+                            "${scripts_dir}/box.linkclear" >> "${run_path}/run_error.log" 2>&1 &
                         else
                             log_msg "当前配置：启用"
                             log_msg "模块服务已是启用，无需操作"
@@ -206,15 +225,20 @@ check_module_service() {
                     rm "${module_dir}/disable" 2>/dev/null
                     log_msg "当前配置：启用"
                     log_msg "模块服务已启用"
+                    [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                    [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
+                    "${scripts_dir}/box.linkclear" >> "${run_path}/run_error.log" 2>&1 &
                 else
                     log_msg "当前配置：启用"
-                    log_msg "当前模块服务已是启用，无需操作"
+                    log_msg "模块服务已是启用，无需操作"
                 fi
             else
                 if [ "$current_state" != "disabled" ]; then
                     touch "${module_dir}/disable"
                     log_msg "当前配置：禁用"
                     log_msg "模块服务已禁用"
+                    [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+                    [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
                 else
                     log_msg "当前配置：禁用"
                     log_msg "当前模块服务已是禁用，无需操作"

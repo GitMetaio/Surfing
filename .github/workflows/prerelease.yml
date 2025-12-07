@@ -28,6 +28,10 @@ jobs:
       - name: Run build.sh
         run: sh build.sh
 
+      - name: Get Short Commit Hash
+        if: env.isAlpha == 'true'
+        run: echo "SHORT_HASH=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Delete current prerelease assets
         uses: andreaswilli/delete-release-assets-action@v3.0.0
         with:
@@ -47,7 +51,7 @@ jobs:
         if: success()
         with:
           tag_name: Prerelease-Alpha
-          files: Surfing_v*.zip
+          files: Surfing_alpha_${{ env.SHORT_HASH }}.zip
           prerelease: true
           generate_release_notes: true
           body: |

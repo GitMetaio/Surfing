@@ -6,7 +6,7 @@ scripts=$(realpath "$0")
 scripts_dir=$(dirname "$scripts")
  
 source ${scripts_dir}/box.config
-source ${scripts_dir}/box.tproxy
+source ${scripts_dir}/box.iptables
  
 TZ=Asia/Shanghai
 export TZ

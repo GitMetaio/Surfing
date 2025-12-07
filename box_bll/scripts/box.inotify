@@ -11,33 +11,32 @@ SCRIPTS_DIR=$(dirname ${SCRIPTS})
 
 source ${SCRIPTS_DIR}/box.config
 
+PID_DIR="/dev/tmp"
+PID_FILE="${PID_DIR}/linkclear.pid"
+SLEEP_PID_FILE="${PID_DIR}/linkclear.sleep.pid"
 SERVICE_PATH="${SCRIPTS_DIR}/box.service"
-TPROXY_PATH="${SCRIPTS_DIR}/box.tproxy"
+TPROXY_PATH="${SCRIPTS_DIR}/box.iptables"
 INOTIFY_SCRIPT="/data/adb/box_bll/scripts/box.inotify"
 HOSTS_PATH="/data/adb/box_bll/clash/etc/"
 HOSTS_FILE="/data/adb/box_bll/clash/etc/hosts"
 SYSTEM_HOSTS="/system/etc/hosts"
-mkdir -p ${run_path}
-
-MONITOR_SCRIPT="${SCRIPTS_DIR}/box.monitor"
-MONITOR_PID_FILE="${SCRIPTS_DIR}/../run/monitor.pid"
+mkdir -p "${run_path}"
 
 service_control() {
-  if [ ! -f "${box_path}/manual" ]; then
-    if [ "${MONITOR_FILE}" = "disable" ]; then
-      if [ "${EVENT}" = "d" ]; then
-        ${SERVICE_PATH} start >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
-        ${TPROXY_PATH} enable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
-        nohup "$MONITOR_SCRIPT" >> "${run_path}/run_error.log" 2>&1 &
-      elif [ "${EVENT}" = "n" ]; then
-        ${TPROXY_PATH} disable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
-        ${SERVICE_PATH} stop >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
-        if [ -f "$MONITOR_PID_FILE" ]; then
-          rm -f "$MONITOR_PID_FILE"
+    if [ ! -f "${box_path}/manual" ] && [ "${MONITOR_FILE}" = "disable" ]; then
+        if [ "${EVENT}" = "d" ]; then
+            ${SERVICE_PATH} start >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
+            ${TPROXY_PATH} enable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
+            [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+            [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
+            "${SCRIPTS_DIR}/box.linkclear" >> "${run_path}/run_error.log" 2>&1 &
+        elif [ "${EVENT}" = "n" ]; then
+            ${TPROXY_PATH} disable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
+            ${SERVICE_PATH} stop >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
+            [ -f "$PID_FILE" ] && kill -9 "$(cat "$PID_FILE")" 2>/dev/null && rm -f "$PID_FILE"
+            [ -f "$SLEEP_PID_FILE" ] && kill -9 "$(cat "$SLEEP_PID_FILE")" 2>/dev/null && rm -f "$SLEEP_PID_FILE"
         fi
-      fi
     fi
-  fi
 }
 service_control
 
@@ -47,7 +46,9 @@ handle_hosts_event() {
             m|c|d)
                 sleep 1
                 umount "$SYSTEM_HOSTS" 2>/dev/null
-                mount -o bind "$HOSTS_FILE" "$SYSTEM_HOSTS"
+                if [ -f "$HOSTS_FILE" ]; then
+                    mount -o bind "$HOSTS_FILE" "$SYSTEM_HOSTS" 2>/dev/null
+                fi
                 ;;
             *)
                 ;;

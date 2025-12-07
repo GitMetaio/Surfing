@@ -185,9 +185,9 @@ download_all_rules() {
     done
 }
 
-CURRENT_VERSION="v13.5.5"
+CURRENT_VERSION="v13.5.8"
 UPDATE_LOG="更新日志: 
-解决后台异常内存占用..."
+新增模块服务调式日志输出.zip"
 
 TOOLBOX_URL="https://raw.githubusercontent.com/GitMetaio/Surfing/main/box_bll/clash/Toolbox.sh"
 TOOLBOX_FILE="/data/adb/box_bll/clash/Toolbox.sh"
@@ -290,34 +290,42 @@ restore_subscribe_urls() {
             { print }
         ' "$CONFIG_PATH" > "$CONFIG_PATH.tmp" && \
         mv "$CONFIG_PATH.tmp" "$CONFIG_PATH"
-
+    
         echo "订阅地址已恢复至新配置中！"
     else
         echo "配置文件不存在，无法提取订阅地址"
     fi
 }
 reload_configuration1() {
-       if [ ! -f "$MODULE_PROP" ]; then
-          echo "↴" 
-          echo "当前未安装模块！"
-          return
-       fi
-       if [ -f "/data/adb/modules/Surfing/disable" ]; then
-          echo "↴" 
-          echo "服务未运行，重载操作失败！"
-          return
-       fi
-          echo "↴"
-          echo "正在重载 clash 配置..."
-          curl -X PUT "$CLASH_RELOAD_URL" -d "{\"path\":\"$CLASH_RELOAD_PATH\"}"
-       if [ $? -eq 0 ]; then
-          echo "ok"
-       else
-          echo "重载失败！"
-       fi
-    }
+   if [ ! -f "$MODULE_PROP" ]; then
+      echo "↴" 
+      echo "当前未安装模块！"
+      return
+   fi
+   if [ -f "/data/adb/modules/Surfing/disable" ]; then
+      echo "↴" 
+      echo "服务未运行，重载操作失败！"
+      return
+   fi
+      echo "↴"
+      echo "正在重载 clash 配置..."
+      curl -X PUT "$CLASH_RELOAD_URL" -d "{\"path\":\"$CLASH_RELOAD_PATH\"}"
+   if [ $? -eq 0 ]; then
+      echo "ok"
+   else
+      echo "重载失败！"
+   fi
+}
 update_module() {
     echo "↴"
+    if [ -z "$GITHUB_TOKEN" ] || [ "$GITHUB_TOKEN" = "你的个人令牌" ]; then
+        use_token=false
+        echo "提示：当前未配置 GitHub 令牌"
+        echo "      使用匿名访问服务可能会受 IP风控 速率等限制！"
+        echo " "
+    else
+        use_token=true
+    fi
     if [ -f "$MODULE_PROP" ]; then
         current_version=$(grep '^version=' "$MODULE_PROP" | cut -d'=' -f2)
         echo "当前模块版本号: $current_version"
@@ -326,9 +334,12 @@ update_module() {
         echo "当前设备没有安装 Surfing 模块"
         echo "↴"
     fi
-
     echo "正在获取服务器中..."
-    module_release=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GIT_URL")
+    if [ "$use_token" = true ]; then
+        module_release=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GIT_URL")
+    else
+        module_release=$(curl -s "$GIT_URL")
+    fi
     module_version=$(echo "$module_release" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
     if [ -z "$module_version" ]; then
         echo "获取服务器失败！"
@@ -337,15 +348,17 @@ update_module() {
     fi
     echo "获取成功！"
     echo "当前最新版本号: $module_version"
-
     if [ -n "$current_version" ] && [ "$current_version" = "$module_version" ]; then
         return
     fi
-
     echo "↴"
     echo "正在获取更新日志..."
     echo
-    changelog=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$CHANGELOG_URL")
+    if [ "$use_token" = true ]; then
+        changelog=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$CHANGELOG_URL")
+    else
+        changelog=$(curl -s "$CHANGELOG_URL")
+    fi
     escaped_version=$(echo "$module_version" | sed 's/\./[.]/g')
     latest_changelog=$(echo "$changelog" | awk -v ver="$escaped_version" '
         /^# / {
@@ -360,7 +373,6 @@ update_module() {
     ')
     echo "$latest_changelog"
     echo
-
     if [ -n "$current_version" ]; then
         echo "发现新版本：$module_version（当前：$current_version）"
         echo " ↳ 请手动至客户端操作"
@@ -597,7 +609,9 @@ show_menu() {
     echo
     printc magenta "14. 一键卸载"
     echo
-    printc magenta "15. Exit"
+    printc magenta "15. Debug"
+    echo
+    printc magenta "16. Exit"
     echo
     printc -n blue "正在等待输出: "
     read -r choice
@@ -655,10 +669,90 @@ show_menu() {
       12) open_project_page ;;
       13) mount_hosts ;;
       14) delete_files_and_dirs ;;
-      15) exit 0 ;;
+      15) service_check ;;
+      16) exit 0 ;;
       *) printc red "无效的输入！" ;;
     esac
   done
+}
+service_check() {
+    DEBUG_DIR="/data/adb/box_bll/clash/Debug"
+    BASE_DIR="/data/adb/box_bll/clash"
+    mkdir -p "$DEBUG_DIR"
+    
+    LOG="$DEBUG_DIR/service_check.log"
+    ZIP_PATH="$BASE_DIR/Debug.zip"
+    : > "$LOG"
+    
+    if [ -d /data/adb/modules/box ]; then
+    echo "Module box Install" >> "$LOG"
+    cp -a /data/adb/modules/box "$DEBUG_DIR/box_module"
+    else
+    echo "Module box No" >> "$LOG"
+    fi
+    
+    if ps -ef >/dev/null 2>&1; then
+    ps -ef | grep notifyd | grep -v grep >> "$LOG" 2>&1
+    else
+    ps | grep notifyd | grep -v grep >> "$LOG" 2>&1
+    fi
+    
+    CFG="/data/adb/box_bll/clash/config.yaml"
+    CFG_OUT="$DEBUG_DIR/config.yaml"
+    
+    if [ -f "$CFG" ]; then
+    awk '
+      /proxy-providers:/ {flag=1}
+      /profile:/ {flag=0}
+      flag==0 {print}
+    ' "$CFG" > "$CFG_OUT"
+    else
+    echo "No config.yaml" >> "$LOG"
+    fi
+    
+    if command -v magisk >/dev/null 2>&1 || [ -d /data/adb/magisk ]; then
+    echo "Root: Magisk" >> "$LOG"
+    elif [ -d /data/adb/ksu ]; then
+    echo "Root: KernelSU" >> "$LOG"
+    elif [ -d /data/adb/ap ]; then
+    echo "Root: APatch" >> "$LOG"
+    else
+    echo "No Root " >> "$LOG"
+    fi
+    
+    BOX_CFG="/data/adb/box_bll/scripts/box.config"
+    if [ -f "$BOX_CFG" ]; then
+    cp -f "$BOX_CFG" "$DEBUG_DIR/"
+    else
+    echo "No box.config" >> "$LOG"
+    fi
+    
+    RUN_DIR="/data/adb/box_bll/run"
+    if [ -d "$RUN_DIR" ]; then
+    cp -a "$RUN_DIR" "$DEBUG_DIR/"
+    else
+    echo "No run" >> "$LOG"
+    fi
+    
+    MODULE_PROP="/data/adb/modules/Surfing/module.prop"
+    if [ -f "$MODULE_PROP" ]; then
+    VER=$(grep -m1 "^version=" "$MODULE_PROP" | cut -d= -f2)
+    echo "Surfing: $VER" >> "$LOG"
+    else
+    echo "No Surfing" >> "$LOG"
+    fi
+    
+    cd "$DEBUG_DIR" || exit 1
+    
+    [ -f "$ZIP_PATH" ] && rm -f "$ZIP_PATH"
+    
+    zip -r "$ZIP_PATH" ./* >/dev/null 2>&1
+    
+    cd "$BASE_DIR" || exit 1
+    
+    rm -rf "$DEBUG_DIR"
+    echo
+    printc blue "box_bll/clash/Debug.zip"
 }
 mount_hosts() {
     local target_dir="/data/adb/box_bll/clash/etc"
@@ -1192,6 +1286,11 @@ reload_configuration() {
     fi
 }
 update_core() {
+    if [ "$NO_UPDATE_ENABLED" = "true" ]; then
+        echo "↴"
+        echo "当前选项是禁用状态，不允许执行该操作！"
+        return
+    fi
     if [ ! -f "$MODULE_PROP" ]; then
         echo "↴" 
         echo "当前未安装模块！"

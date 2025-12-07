@@ -1,18 +1,16 @@
-# Surfing
-
 <h1 align="center">
-  <img src="./folder/logo.svg" alt="BOXMETA" width="200">
-  <br>BOXMETA<br>
+  <img src="./folder/logo.svg" alt="logo" width="200">
+  <br>Surfing<br>
 </h1>
 
 <h3 align="center">Magisk, Kernelsu, APatch</h3>
 
 <div align="center">
-    <a href="https://github.com/MoGuangYu/Surfing/releases/tag/Prerelease-Alpha">
+    <a href="https://github.com/GitMetaio/Surfing/releases/tag/Prerelease-Alpha">
         <img alt="Android" src="https://img.shields.io/badge/Module Latestsnapshot-F05033.svg?logo=android&logoColor=white">
     </a>
-    <a href="https://github.com/MoGuangYu/Surfing/releases">
-    <img alt="Downloads" src="https://img.shields.io/github/downloads/MoGuangYu/Surfing/total?label=Module%20Download&labelColor=00b56a&logo=git&logoColor=white">
+    <a href="https://github.com/GitMetaio/Surfing/releases">
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/GitMetaio/Surfing/total?label=Module%20Download&labelColor=00b56a&logo=git&logoColor=white">
 </a>
 </div>
 <br>
@@ -64,51 +62,42 @@ Please decide whether to use the Surfing module only after clearly understanding
 
 ## Installation
 
-- Download the module zip file from the [Release](https://github.com/MoGuangYu/Surfing/releases) page and install it via Magisk Manager, KernelSU Manager, or APatch.
+- Download the module zip file from the [Release](https://github.com/GitMetaio/Surfing/releases) page and install it via Magisk Manager, KernelSU Manager, or APatch.
 - Version changes: [📲log](changelog.md)
 
 ## Uninstallation
 
-- Uninstall the module from the Magisk Manager, Kernelsu Manager, or APatch application. [👉🏻Removal Command](https://github.com/MoGuangYu/Surfing/blob/main/uninstall.sh#L3-L4)
+- Simply uninstall this module from Magisk Manager, Kernelsu Manager, or APatch app [👉🏻Uninstall Script](https://github.com/GitMetaio/Surfing/blob/main/uninstall.sh#L3-L4)
 
-> Uninstalling this module through the manager will uninstall all corresponding service data. Web and other tile apps need to be uninstalled manually.
+> Uninstalling this module via a manager will remove all associated service data. Web-related tiles or APKs may need to be uninstalled manually.
 
 ## Wiki
 
 <details>
-<summary>1. First Use</summary>
+<summary>1. First-Time Use</summary>
 
-- After installing the module for the first time, **please first** add your subscription URL to `/data/adb/box_bll/clash/config.yaml`, and then manually restart the device once.
-- Toggle the module switch once and open the **Web** application on the desktop
-- Due to network reasons, the **rules**/**subscriptions** may not be fully downloaded automatically. Please manually refresh the panel.
-  - If the subscription fails to load, please try to switch the **UA** in the configuration file
-  - If the above fails, ensure your network environment is normal.
-- ~~After the configuration and node fetching are complete, go to~~: 
-- ~~**Settings** → **Search Box**, and search for the keyword "DNS." If similar options appear, select them~~:
-  - ~~Private DNS~~
-  - ~~Dedicated DNS~~
-- ~~And configure the custom domain~~:
-```text
-1dot1dot1dot1.cloudflare-dns.com
-```
+- After the module is installed for the first time, **please first** add your subscription URL in `/data/adb/box_bll/clash/config.yaml`, then manually reboot your device once.
+- After rebooting, toggle the module switch once, open the **Web** app on your desktop, and you can start using it.
+- Due to network issues, not all **rules**/**subscriptions** may download automatically; please manually refresh them in the panel.
+- If subscriptions fail to load, try switching the **Ua** in the configuration file.
+- If the above fails, ensure your network environment is normal.
 
 - Web App:
-  - It is purely a graphical tool for portable browsing and managing backend routing data, with no other unnecessary uses.
+    - Used for portable browsing and managing backend routing data
+    - Automatically updates core files on startup
 
 <img src="./folder/Webapk.png" alt="Web UI" width="300">
-
-> The module has an integrated GUI that can be accessed locally via a browser or online via the app. The two are essentially the same.
 
 </details>
 
 #
 
 <details>
-<summary>2. Control Operation</summary>
+<summary>2. Controlling Operation</summary>
 
-- Can control the start and stop via **WiFi SSID** network.
-- Can control the operation service by turning the module switch on/off, with real-time effect.
-- You can add the control switch tile of the module to the system status bar. If you cannot find the tile switch after installing the module and restarting the device, you can manually install the Apk [Download source code](https://raw.githubusercontent.com/MoGuangYu/Surfing/main/folder/SurfingTile.tar.gz)
+- You can control start/stop via **WiFi SSID**.
+- You can control service in real-time using the module toggle switch.
+- You can add the module's control tile to the system status bar. If the tile switch cannot be found after installing the module and rebooting, you can manually install the APK [Download Source](https://raw.githubusercontent.com/GitMetaio/Surfing/main/folder/SurfingTile.tar.gz)
 
 </details>
 
@@ -117,33 +106,28 @@ Please decide whether to use the Surfing module only after clearly understanding
 <details>
 <summary>3. Routing Rules</summary>
 
-GitHub Actions automatically builds at 6 AM Beijing Time every day to ensure the rules are up to date.
+GitHub Actions automatically builds every day at 6 AM Beijing time to ensure the rules are up-to-date.
 
-> The routing rules are all linked online and automatically updated every 24 hours.
+> All routing rules use online links and update automatically 24/7.
 
 </details>
 
 #
 
 <details>
-<summary>4. Subsequent Updates</summary>
+<summary>4. Future Updates</summary>
 
-- If you are using the default configuration, updates will be seamless.
-- Supports online module updates from the client. No reboot is required after updating, but a reboot is still recommended.
-- During updates, the configuration file will be backed up to:
+- If you are using all default configurations, updates will be seamless.
+- Supports online updates from the client; reboot is not required but still recommended.
+- During updates, configuration files will be backed up to:
    - `config.yaml.bak`
-- User configuration will be backed up during the update to:
+- User configuration files will be backed up to:
    - `box.config.bak`
-- Your subscription URL will be automatically extracted and backed up to:
+- Subscription URLs will be automatically extracted and backed up to:
    - `proxies/subscribe_urls_backup.txt`
-   - The backup will be automatically extracted and restored to the new configuration, suitable for those using the default configuration file.
+   - The backup will be automatically restored into the new configuration, suitable for default configuration usage.
 
-- Module updates do not include:
-   - Geo database files
-   - Bin files
-   - Web resources
-
-> Ps: The update mainly follows upstream updates and delivers some configurations.
+> Note: Updates mainly follow upstream changes and may push some configuration adjustments.
 
 </details>
 
@@ -152,68 +136,65 @@ GitHub Actions automatically builds at 6 AM Beijing Time every day to ensure the
 <details>
 <summary>5. Usage Issues</summary>
 
-1. Proxy Specific Applications (Black/Whitelist)
-- To proxy all applications except certain ones, open the `/data/adb/box_bll/scripts/box.config` file, set the `proxy_mode` value to `blacklist` (default), and add elements to the `user_packages_list` array. The format for elements is `id:package_name`, separated by spaces. For example, `user_packages_list=("id:package_name" "id:package_name")` to **not proxy** specific Android user applications.
+**1. Proxy Specific Apps (Blacklist/Whitelist)**
 
-- To only proxy specific applications, open the `/data/adb/box_bll/scripts/box.config` file, set the `proxy_mode` value to `whitelist`, and add elements to the `user_packages_list` array. The format for elements is `id:package_name`, separated by spaces. For example, `user_packages_list=("id:package_name" "id:package_name")` to **only proxy** specific Android user applications.
+- To proxy all apps except certain ones, open `/data/adb/box_bll/scripts/box.config`, set `proxy_mode` to `blacklist` (default), and add elements to the `user_packages_list` array in the format `id:package_name`, separated by spaces. These apps will **not** be proxied. Example: `user_packages_list=("id:package_name" "id:package_name")`
 
-Android user group ID identifiers:
+- To proxy only specific apps, open `/data/adb/box_bll/scripts/box.config`, set `proxy_mode` to `whitelist`, and add elements to the `user_packages_list` array in the format `id:package_name`, separated by spaces. Only these apps will be proxied. Example: `user_packages_list=("id:package_name" "id:package_name")`
 
-| Standard User | ID  |
-| ------------- | --- |
-| Owner         |  0  |
-| Second Space  |  10 |
-| App Clone     | 999 |
+Android user group IDs:
 
-> Typically, you can find all user group IDs and application package names in `/data/user/`. Do not use fake-ip mode when using black/whitelist.
+| User Type       | ID  |
+| --------------- | --- |
+| Owner           | 0   |
+| Phone Clone     | 10  |
+| Multiple Apps   | 999 |
 
-2. Tun Mode
-- ~~Enabled by default~~
-- ~~Better routing traffic management~~
-- ~~Deprecated in v7.4.3~~
+> You can usually find all user group IDs and app package names under `/data/user/`.
 
-> ~~If you have special needs, you can turn it off by yourself~~. Please do not use the black and white list before using this mode.
+**2. Tun Mode**
 
-3. Routing Rules
-- Designed for mainland China usage
-- Sufficient for most daily needs
+- Enabled by default
+- Better traffic management
+- When using blacklist/whitelist, exclude the corresponding package names
 
-> If there are no strict requirements, the whitelist/blacklist is not very meaningful, and the default configuration of the module is enough.
+> Can be disabled via configuration if needed.
 
-4. Panel Management
-- Magisk Font Module
+**3. Routing Rules**
 
-> May affect normal display of page fonts.
+- Optimized for Mainland China
+- Meets most daily usage requirements
 
-5. LAN Sharing
-- Enable hotspot and let other devices connect.
-- TUN Gateway: `172.20.0.1`
+> With increasingly robust routing rules, blacklist/whitelist may become less necessary.
 
-> To access the dashboard backend from other devices, visit: `http://<Current WiFi/TUN Gateway>:9090/ui`
+**4. Panel Management**
 
-~~6. Private DNS~~
-- ~~**When enabled**, please **ensure the module service is running properly**, **otherwise**, it may affect CN resolution and result in **no internet connection**.~~
-- ~~This is an optional feature ✅~~
-- ~~It is recommended to enable it.~~
+- Magisk font modules
 
-> This is to fully solve some IPv6 DNS request leaks under Wan0.
+> May affect proper display of panel fonts.
 
-7. Host File
-- No need to mount
-   - Just delete the file.
-- To remount
-   - Create a new file in the **etc** folder.
-- All modifications take effect immediately.
-- When updating/installing, you can use the volume up and down keys to choose whether to mount.
+**5. LAN Sharing**
 
-> Domain IP redirection.
+- Enable hotspot to allow other devices to connect
+- Tun Gateway: `172.20.0.1`
+
+> To access the backend console from other devices: `http://<CurrentWiFi>/172.20.0.1:9090/ui`
+
+**6. Host File**
+
+- No need to mount: just delete the file
+- To remount: create a new one in the **etc folder**
+- All changes take effect immediately
+- During update/installation, you can use volume keys Up(Mount) / Down(Unmount) to choose whether to mount
+
+> Local IP redirection for domains, forced binding
 
 </details>
 
 ---
 
 <a href="./LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/MoGuangYu/Surfing.svg">
+    <img alt="License" src="https://img.shields.io/github/license/GitMetaio/Surfing.svg">
 </a>
 
 ## Acknowledgments

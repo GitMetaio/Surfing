@@ -38,7 +38,7 @@ esac
 }
 
 check_permission() {
-  if which "${bin_name}" | grep -q "/system/bin/"; then
+  if command -v "${bin_name}" | grep -q "/system/bin/"; then
     box_user=$(echo "${box_user_group}" | awk -F ':' '{print $1}')
     box_group=$(echo "${box_user_group}" | awk -F ':' '{print $2}')
     box_user_id=$(id -u "${box_user}")
@@ -49,7 +49,7 @@ check_permission() {
       log Error "用户组 ${box_user_group} 错误，使用 root:net_admin 代替."
     }
     
-    bin_path=$(which "${bin_name}")
+    bin_path=$(command -v "${bin_name}")
     chown "${box_user_group}" "${bin_path}"
     chmod 0755 "${bin_path}"
     
@@ -320,6 +320,7 @@ case "$1" in
     display_bin_status || start_service
     if [ $? -eq 0 ]; then
       uptime_sec=$(cut -d. -f1 /proc/uptime)
+      uptime_sec=${uptime_sec:-0}
       if [ "$uptime_sec" -lt 180 ]; then
         log Info "系统已重启，正在等待服务初始化..."
         sleep 5

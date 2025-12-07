@@ -26,7 +26,7 @@ find-process-mode: always
 global-client-fingerprint: chrome
 external-controller: 0.0.0.0:9090 # 切勿修改端口会影响状态栏磁贴
 external-ui-url: "https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip"
-external-ui: "./Web/Zash/"
+external-ui: "./webroot/Zash/"
 secret: "" # 面板访问密码，如在公网访问建议设置
 # —————————
 # ==== Tips
@@ -119,7 +119,7 @@ sniffer:
 
 # 网卡模块
 tun:
-  enable: true  # true 开 # false 默认关
+  enable: false
   device: Meta
   stack: gvisor
   dns-hijack:
@@ -130,7 +130,9 @@ tun:
   strict-route: true
   auto-redirect: false
   auto-detect-interface: true
-  exclude-package:
+  exclude-package: # 如黑白名单这里需排除
+   # - com.tencent.mm
+   # - com.tencent.mobileqq
     # _____________________# 三星专供 ↓ 范围
 #    - com.samsung.android.messaging
 #    - com.samsung.android.app.telephonyui
@@ -143,7 +145,6 @@ tun:
 #    - com.sec.epdg
 #    - com.sec.imsservice # 三星专供 ↑ 范围
     # 非三星用户不必理会，三星用户需自行取消注释
-    
 # —————————
 
 
@@ -153,7 +154,7 @@ dns:
   enable: true
   ipv6: true
   listen: 0.0.0.0:1053
-  enhanced-mode: fake-ip
+  enhanced-mode: fake-ip # redir-host
   fake-ip-range: 172.20.0.1/16
   fake-ip-filter:
     - "RULE-SET:CN_域"
@@ -161,57 +162,58 @@ dns:
     - "RULE-SET:GoogleFCM_域"
     - "+.3gppnetwork.org"
     - "+.xtracloud.net"
-  direct-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 瓦洛兰大陆&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 瓦洛兰大陆&h3=true
   proxy-server-nameserver:
-    - https://doh.pub/dns-query#🇨🇳 瓦洛兰大陆&h3=false
-    - https://dns.alidns.com/dns-query#🇨🇳 瓦洛兰大陆&h3=true
+    - https://1.12.12.12:443/dns-query#🌐 本机·本地直连&h3=false
+    - https://120.53.53.53:443/dns-query#🌐 本机·本地直连&h3=false
+    - https://223.5.5.5:443/dns-query#🌐 本机·本地直连&h3=true
+    - https://223.6.6.6:443/dns-query#🌐 本机·本地直连&h3=true
   nameserver-policy:
     "RULE-SET:CN_域,Microsoft_域,Apple_域":
-       - https://doh.pub/dns-query#🇨🇳 瓦洛兰大陆&h3=false
-       - https://dns.alidns.com/dns-query#🇨🇳 瓦洛兰大陆&h3=true
+      - https://1.12.12.12:443/dns-query#🌐 本机·本地直连&h3=false
+      - https://120.53.53.53:443/dns-query#🌐 本机·本地直连&h3=false
+      - https://223.5.5.5:443/dns-query#🌐 本机·本地直连&h3=true
+      - https://223.6.6.6:443/dns-query#🌐 本机·本地直连&h3=true
   nameserver:
-    - https://dns.google/dns-query#DNS连接&h3=true
-    - https://cloudflare-dns.com/dns-query#DNS连接&h3=true
+    # Google
+    - https://8.8.8.8:443/dns-query#DNS连接&h3=true
+    - https://8.8.4.4:443/dns-query#DNS连接&h3=true
+    # Cloudflare
+    - https://1.1.1.1:443/dns-query#DNS连接&h3=true
+    - https://1.0.0.1:443/dns-query#DNS连接&h3=true
+  direct-nameserver:
+    # 腾讯/阿里兜底
+    # 正确配置本地后可移除 否则会卡[可选]
+    - 1.12.12.12
+    - 223.6.6.6
+    # ----------------
+    # 你的本地
+    # 各大路由器/光猫默认 DNS
+    - 192.168.1.1    # 请确保当前局域网可通
+    # SIM卡运营商 [下方替换成你的运营商 一般有鉴权]
+    - 120.80.80.80  # ← 替换成你想用的 或者删除
+    - 221.5.88.88   # ← 替换成你想用的 或者删除
 # —————————
 
 proxies:
-  - {name: 🇨🇳 瓦洛兰大陆, type: direct, udp: true}
-  - {name: ⛔️ 拒绝连接, type: reject}
+  - {name: 🌐 本机·本地直连, type: direct, udp: true}
+  - {name: ⛔️ 禁止·拒绝连接, type: reject}
   - {name: 🌐 DNS_Hijack, type: dns}
 
 proxy_groups: &proxy_groups
     type: select
     proxies:
       - 总模式
-      - ⛔️ 拒绝连接
-      - 延迟最低
-      - 故障转移
-      - 负载均衡
-      - 香港节点
-      - 台湾节点
-      - 狮城节点
-      - 日本节点
-      - 美国节点
-      - 其它地区
-      - 🇨🇳 瓦洛兰大陆
-    <<: *A
-CNproxy_groups: &CNproxy_groups
-    type: select
-    proxies:
-      - 🇨🇳 瓦洛兰大陆
-      - ⛔️ 拒绝连接
-      - 总模式
-      - 延迟最低
-      - 故障转移
-      - 负载均衡
-      - 香港节点
-      - 台湾节点
-      - 狮城节点
-      - 日本节点
-      - 美国节点
-      - 其它地区
+      - ALL·延迟最低
+      - ALL·负载均衡
+      - ALL·故障转移
+      - ALL·中国台湾
+      - ALL·香港地区
+      - ALL·美国地区
+      - ALL·日本地区
+      - ALL·狮城地区
+      - ALL·其它地区
+      - ⛔️ 禁止·拒绝连接
+      - 🌐 本机·本地直连
     <<: *A
 # —————————
 proxy-groups:
@@ -219,47 +221,47 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/All.svg"
     type: select
     proxies:
-      - 延迟最低
-      - 故障转移
-      - 负载均衡
-      - 香港节点
-      - 台湾节点
-      - 狮城节点
-      - 日本节点
-      - 美国节点
-      - 其它地区
-      - 🇨🇳 瓦洛兰大陆
+      - ALL·延迟最低
+      - ALL·负载均衡
+      - ALL·故障转移
+      - ALL·日本地区
+      - ALL·中国台湾
+      - ALL·香港地区  
+      - ALL·美国地区
+      - ALL·狮城地区
+      - ALL·其它地区
+      - 🌐 本机·本地直连
 
   - name: 订阅更新
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Update.svg"
     type: select
     proxies:
-      - 🇨🇳 瓦洛兰大陆
+      - 🌐 本机·本地直连
       - 总模式
 
   - name: 小红书
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/XiaoHongShu.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: 抖音
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/DouYin.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: BiliBili
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/BiliBili.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Steam
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Steam.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Apple
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Apple.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Microsoft
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Microsoft.svg"
-    <<: *CNproxy_groups
+    <<: *proxy_groups
 
   - name: Telegram
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Telegram.svg"
@@ -321,7 +323,7 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/No-ads-all.svg"
     type: select
     proxies:
-      - ⛔️ 拒绝连接
+      - ⛔️ 禁止·拒绝连接
       - 🌐 DNS_Hijack
       - REJECT-DROP
       - PASS
@@ -330,68 +332,66 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/WebRTC.svg"
     type: select
     proxies:
-      - ⛔️ 拒绝连接
+      - ⛔️ 禁止·拒绝连接
       - 🌐 DNS_Hijack
       - REJECT-DROP
       - PASS
 
-  - name: 白名单出站
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/User.svg"
-    <<: *CNproxy_groups
-
-  - name: 延迟最低
+  - name: ALL·延迟最低
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: url-test
     <<: *A
 
-  - name: 故障转移
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
-    type: fallback
-    <<: *A
-
-  - name: 负载均衡
+  - name: ALL·负载均衡
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
     type: load-balance
     strategy: round-robin
     <<: *A
 
-  - name: 台湾节点
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
-    filter: "^(?=.*(台|新北|彰化|TW|Taiwan)).*$"
-    <<: *All
+  - name: ALL·故障转移
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Return.svg"
+    type: fallback
+    <<: *A
 
-  - name: 香港节点
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
-    filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
-    <<: *All
-
-  - name: 日本节点
+  - name: ALL·日本地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/JP.svg"
     filter: "^(?=.*(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan)).*$"
     <<: *All
 
-  - name: 美国节点
+  - name: ALL·中国台湾
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/CN.svg"
+    filter: "^(?=.*(台|新北|彰化|TW|Taiwan|taipei)).*$"
+    <<: *All
+
+  - name: ALL·香港地区
+    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/HK.svg"
+    filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
+    <<: *All
+
+  - name: ALL·美国地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/US.svg"
     filter: "^(?=.*(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States)).*$"
     <<: *All
 
-  - name: 狮城节点
+  - name: ALL·狮城地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Singapore.svg"
     filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"
     <<: *All
 
-  - name: 其它地区
+  - name: ALL·其它地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Globe.svg"
-    filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网)).*$"
+    filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch|网址|售|防失)).*$"
     <<: *All
-    
-  - name: CNTEST
-    icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/icon/Meter.svg"
+
+  - name: 特殊地址
+    icon: "https://cdn.jsdelivr.net/gh/MoGuangYu/Surfing@rm/Home/icon/User.svg"
     type: select
-    url: https://www.gstatic.com/generate_204
+    url: https://www.baidu.com/favicon.ico
     interval: 86400
     proxies:
-      - 🇨🇳 瓦洛兰大陆
+      - 🌐 本机·本地直连
+      - ⛔️ 禁止·拒绝连接
+
 # —————————
 
 rule-anchor:
@@ -403,14 +403,12 @@ rule-anchor:
     {type: http, behavior: ipcidr, format: mrs, interval: 86400}
   Domain: &Domain
     {type: http, behavior: domain, format: mrs, interval: 86400}
-
 # —————————
-
 
 # 部分规则上游为https://github.com/blackmatrix7/ios_rule_script
 # Github Actions 每日自动同步跟随更新
 rule-providers:
-  自定义出站: # 主要用于广告误杀自定义放行
+  自定义规则: # 主要用于广告误杀自定义放行
     <<: *Local
     path: ./etc/自定义规则.list # 请按路径新建文件及建立你需要的规则
 
@@ -581,20 +579,20 @@ rules:
   - DST-PORT,53,🌐 DNS_Hijack
   - DST-PORT,853,DNS连接
 
-  - RULE-SET,自定义出站,白名单出站
+  - RULE-SET,自定义规则,特殊地址
 
   - RULE-SET,WebRTC_端/域,WebRTC
   - RULE-SET,No-ads-all_域,广告拦截
 
-  - PROCESS-PATH,com.ss.android.ugc.aweme,抖音
+  - PROCESS-NAME,com.ss.android.ugc.aweme,抖音
   - RULE-SET,DouYin_域,抖音
 
-  - PROCESS-PATH,com.xingin.xhs,小红书
+  - PROCESS-NAME,com.xingin.xhs,小红书
   - RULE-SET,XiaoHongShu_域,小红书
 
-  - PROCESS-PATH,tv.danmaku.bili,BiliBili
+  - PROCESS-NAME,tv.danmaku.bili,BiliBili
   - RULE-SET,BiliBili_域,BiliBili
-  - RULE-SET,BiliBili_IP,BiliBili
+  - RULE-SET,BiliBili_IP,BiliBili,no-resolve
 
   - RULE-SET,Steam_域,Steam
 
@@ -605,42 +603,42 @@ rules:
   - RULE-SET,TikTok_域,TikTok
 
   - RULE-SET,Twitter_域,Twitter(X)
-  - RULE-SET,Twitter_IP,Twitter(X)
+  - RULE-SET,Twitter_IP,Twitter(X),no-resolve
 
   - RULE-SET,YouTube_域,YouTube
-  - RULE-SET,YouTube_IP,YouTube
+  - RULE-SET,YouTube_IP,YouTube,no-resolve
 
-  - DOMAIN-KEYWORD,mtalk.google,GoogleFCM
+  - DOMAIN,android.apis.google.com,Google
+  - RULE-SET,GoogleFCM_域,GoogleFCM
 
   - RULE-SET,Google_域,Google
-  - RULE-SET,Google_IP,Google
+  - RULE-SET,Google_IP,Google,no-resolve
 
   - RULE-SET,Netflix_域,Netflix
-  - RULE-SET,Netflix_IP,Netflix
+  - RULE-SET,Netflix_IP,Netflix,no-resolve
 
   - RULE-SET,Spotify_域,Spotify
-  - RULE-SET,Spotify_IP,Spotify
+  - RULE-SET,Spotify_IP,Spotify,no-resolve
 
   - RULE-SET,Facebook_域,Facebook
-  - RULE-SET,Facebook_IP,Facebook
+  - RULE-SET,Facebook_IP,Facebook,no-resolve
 
   - RULE-SET,OpenAI_域,OpenAI
-  - RULE-SET,OpenAI_IP,OpenAI
+  - RULE-SET,OpenAI_IP,OpenAI,no-resolve
 
   - RULE-SET,Apple_域,Apple
-  - RULE-SET,Apple_IP,Apple
+  - RULE-SET,Apple_IP,Apple,no-resolve
 
   - RULE-SET,Microsoft_域,Microsoft
 
   - RULE-SET,Telegram_域,Telegram
-  - RULE-SET,Telegram_IP,Telegram
+  - RULE-SET,Telegram_IP,Telegram,no-resolve
 
-  - DOMAIN,browserleaks.com,漏网之鱼
+  - RULE-SET,Private_域,🌐 本机·本地直连
+  - RULE-SET,Private_IP,🌐 本机·本地直连,no-resolve
 
-  - RULE-SET,CN_域,🇨🇳 瓦洛兰大陆
-  - RULE-SET,CN_IP,🇨🇳 瓦洛兰大陆
-  - RULE-SET,Private_域,🇨🇳 瓦洛兰大陆
-  - RULE-SET,Private_IP,🇨🇳 瓦洛兰大陆
+  - RULE-SET,CN_域,🌐 本机·本地直连
+  - RULE-SET,CN_IP,🌐 本机·本地直连
 
   - MATCH,漏网之鱼
 # —————————
