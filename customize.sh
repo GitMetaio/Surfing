@@ -247,8 +247,6 @@ if [ -d /data/adb/box_bll ]; then
   fi
   if [ "$INSTALL_APK" = true ]; then
     install_Web_apk
-  else
-    choose_to_install_Web_apk
   fi
   
   extract_subscribe_urls
@@ -297,7 +295,7 @@ if [ -d /data/adb/box_bll ]; then
   sleep 1
   locale_print "正在重启服务…" "Restarting service..."
   /data/adb/box_bll/scripts/box.service start > /dev/null 2>&1
-  locale_print "更新完成。无需重启…" "Update completed. No need to reboot..."
+  locale_print "更新完成，无需重启" "Update completed. No need to reboot."
 else
   locale_print "正在安装…" "Installing..."
   ui_print "↴"
