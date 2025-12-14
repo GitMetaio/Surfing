@@ -24,15 +24,27 @@ SURFING_TILE_DIR="/data/adb/modules_update/Surfing_Tile"
 MODULE_PROP_PATH="/data/adb/modules/Surfing/module.prop"
 MODULE_VERSION_CODE=$(awk -F'=' '/versionCode/ {print $2}' "$MODULE_PROP_PATH")
 
-locale_print() {
+print_loc() {  # print locale content
 
   if [ "$LOCALE" = "zh-CN" ]; then
-    ui_print "$1"
+    ui_print " $1"
   else
-    ui_print "$2"
+    ui_print " $2"
   fi
 
 }
+
+printl() {  # print line
+
+  length=28
+  symbol=*
+
+  line=$(printf "%-${length}s" | tr ' ' "$symbol")
+  ui_print "$line"
+
+}
+
+printe() { ui_print " "; }  # print empty line
 
 if [ "$MODULE_VERSION_CODE" -lt 1622 ]; then
   INSTALL_APK=true
@@ -72,13 +84,13 @@ extract_subscribe_urls() {
     sed 's/&/\\&/g' > "$BACKUP_FILE"
     
     if [ -s "$BACKUP_FILE" ]; then
-      locale_print "已备份订阅地址至：" "Backed up subscription URLs to:"
-      ui_print "proxies/subscribe_urls_backup.txt"
+      print_loc "已备份订阅地址至：" "Backed up the subscription URLs to:"
+      ui_print " proxies/subscribe_urls_backup.txt"
     else
-      locale_print "未找到 URLs，请检查配置文件格式。" "No URLs found. Check config format."
+      print_loc "未找到 URLs，请检查配置文件格式" "No URLs found. Check config format."
     fi
   else
-    locale_print "配置文件不存在，无法提取 URLs。" "Config file missing. Cannot extract URLs."
+    print_loc "配置文件不存在，无法提取 URLs" "Config file missing. Cannot extract URLs."
   fi
 }
 
@@ -94,20 +106,27 @@ restore_subscribe_urls() {
          /profile:/ { inBlock = 0 }
          { print }
         ' "$BACKUP_FILE" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
-    locale_print "已还原 URLs 至 config.yaml" "Restored URLs to config.yaml"
+    print_loc "已还原 URLs 至 config.yaml" "Restored URLs to config.yaml"
   else
-    locale_print "找不到可用备份，已跳过还原。" "No valid backup found. Skipped restore."
+    print_loc "找不到可用备份，已跳过还原" "No valid backup found. Skipped restore."
   fi
+  printe
 }
 
 install_Web_apk() {
   if [ -f "$APK_FILE" ]; then
     cp "$APK_FILE" "$INSTALL_DIR/"
-    locale_print "正在安装 Web APP…" "Installing Web APP..."
-    pm install "$INSTALL_DIR/Web.apk"
+    print_loc "正在安装 Web APP…" "Installing Web APP..."
+    pm install "$INSTALL_DIR/Web.apk" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      print_loc "已安装" "Success"
+    else
+      print_loc "安装失败" "Failed"
+    fi
+    printe
     rm -rf "$INSTALL_DIR/Web.apk"
   else
-    locale_print "Web.apk 未找到" "Web.apk not found"
+    print_loc "Web.apk 未找到" "Web.apk not found"
   fi
 }
 
@@ -116,11 +135,17 @@ install_Surfingtile_apk() {
   APK_TMP="$INSTALL_DIR/com.surfing.tile.apk"
   if [ -f "$APK_SRC" ]; then
     cp "$APK_SRC" "$APK_TMP"
-    locale_print "正在安装 SurfingTile APP…" "Installing SurfingTile APP..."
-    pm install "$APK_TMP"
+    print_loc "正在安装 SurfingTile APP…" "Installing SurfingTile APP..."
+    pm install "$APK_TMP" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      print_loc "已安装" "Success"
+    else
+      print_loc "安装失败" "Failed"
+    fi
+    printe
     rm -f "$APK_TMP"
   else
-    locale_print "SurfingTile APK 未找到" "SurfingTile APK not found"
+    print_loc "SurfingTile APK 未找到" "SurfingTile APK not found"
   fi
 }
 
@@ -137,12 +162,13 @@ install_surfingtile_module() {
 choose_volume_key() {
     timeout_seconds=10
 
-    locale_print "等待按键中 (${timeout_seconds}秒)" "Waiting for pressing key (${timeout_seconds}s)..."
+    print_loc "等待按键中 (${timeout_seconds}秒)" "Waiting for pressing key (${timeout_seconds}s)..."
 
     read -r -t $timeout_seconds line < <(getevent -ql | awk '/KEY_VOLUME/ {print; exit}')
 
+    printe
     if [ $? -eq 142 ]; then
-        locale_print "未检测到按键，执行默认选项…" "No input detected. Running default option..."
+        print_loc "未检测到按键，执行默认选项…" "No input detected. Running default option..."
         return 1
     fi
 
@@ -154,27 +180,33 @@ choose_volume_key() {
 }
 
 choose_to_umount_hosts_file() {
-
-  locale_print "是否挂载 hosts 文件至系统？" "Mount the hosts file to the system ?"
-  locale_print "音量增加键：挂载" "Volume Up: Mount"
-  locale_print "音量减少键：卸载 (默认)" "Volume Down: Uninstall (default)"
+  printl
+  printe
+  print_loc "是否挂载 hosts 文件至系统？" "Mount the hosts file to the system ?"
+  printe
+  print_loc "音量增加键：挂载" "Volume Up: Mount"
+  print_loc "音量减少键：卸载 (默认)" "Volume Down: Uninstall (default)"
 
   if choose_volume_key; then
-    locale_print "已挂载 hosts 文件" "Hosts file mounted"
+    print_loc "已挂载 hosts 文件" "Hosts file mounted"
   else
-    locale_print "已卸载 hosts 文件" "Uninstalling hosts file is complete"
+    print_loc "已卸载 hosts 文件" "Uninstalling hosts file is complete"
     rm -f "$HOSTS_FILE"
   fi
+  printe
 
 }
 
 choose_to_install_surfingtile_module() {
-  locale_print "是否安装 SurfingTile APP?" "Install SurfingTile APP?"
-  locale_print "音量增加键：否" "Volume Up: No"
-  locale_print "音量减少键：是 (默认)" "Volume Down: Yes (default)"
+  printl
+  printe
+  print_loc "是否安装 SurfingTile APP?" "Install SurfingTile APP?"
+  printe
+  print_loc "音量增加键：否" "Volume Up: No"
+  print_loc "音量减少键：是 (默认)" "Volume Down: Yes (default)"
 
   if choose_volume_key; then
-    locale_print "已跳过安装 SurfingTile APP…" "Skip installing SurfingTile APP..."
+    print_loc "已跳过安装 SurfingTile APP…" "Skip installing SurfingTile APP..."
   else
     install_surfingtile_module
     install_Surfingtile_apk
@@ -182,12 +214,15 @@ choose_to_install_surfingtile_module() {
 }
 
 choose_to_install_Web_apk() {
-  locale_print "是否安装 Web APP?" "Install Web APP?"
-  locale_print "音量增加键：否" "Volume Up: No"
-  locale_print "音量减少键：是 (默认)" "Volume Down: Yes (default)"
+  printl
+  printe
+  print_loc "是否安装 Web APP?" "Install Web APP?"
+  printe
+  print_loc "音量增加键：否" "Volume Up: No"
+  print_loc "音量减少键：是 (默认)" "Volume Down: Yes (default)"
 
   if choose_volume_key; then
-    locale_print "已跳过安装 Web APP…" "Skip installing Web APP..."
+    print_loc "已跳过安装 Web APP…" "Skip installing Web APP..."
   else
     install_Web_apk
   fi
@@ -198,30 +233,33 @@ remove_old_surfingtile() {
   OLD_TILE_APP="$(pm path "com.yadli.surfingtile" 2>/dev/null | sed 's/package://')"
 
   if [ -d "$OLD_TILE_MODDIR" ]; then
-    locale_print "卸载旧版本 SurfingTile 模块中…" "Uninstalling old SurfingTile module..."
-    touch "${OLD_TILE_MODDIR}/remove" && locale_print "重启后完成卸载" "Reboot to take effect"
+    print_loc "卸载旧版本 SurfingTile 模块中…" "Uninstalling old SurfingTile module..."
+    touch "${OLD_TILE_MODDIR}/remove" && print_loc "重启后完成卸载" "Reboot to take effect"
   fi
 
   if [ -n "$OLD_TILE_APP" ]; then
-    locale_print "卸载旧版本 SurfingTile APP 中…" "Uninstalling old SurfingTile APP..."
-    pm uninstall "com.yadli.surfingtile"
+    print_loc "卸载旧版本 SurfingTile APP 中…" "Uninstalling old SurfingTile APP..."
+    pm uninstall "com.yadli.surfingtile" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      print_loc "已卸载" "Success"
+    else
+      print_loc "卸载失败" "Failed"
+    fi
   fi
 }
 
 unzip -qo "${ZIPFILE}" -x 'META-INF/*' -d "$MODPATH"
 
 if [ -z "$LOCALE" ]; then
-  ui_print "请选择你所使用的语言：
-Please select your language:
-
+  printe
+  ui_print "  请选择你所使用的语言：
+  Please select your language:
+  
 - 音量增加键：简体中文
   Volume Up: Simplified Chinese
-
 - 音量减少键：English
   Volume Down: English (default)
-
-"
-
+  "
   if choose_volume_key; then
     LOCALE=zh-CN
   else
@@ -229,17 +267,19 @@ Please select your language:
   fi
 fi
 
-locale_print "欢迎使用 Surfing" "Welcome to Surfing"
-
+printe
+print_loc "欢迎使用 Surfing" "Welcome to Surfing"
 remove_old_surfingtile
 
 if [ -d /data/adb/box_bll ]; then
-  locale_print "更新中…" "Updating..."
-  ui_print "↴"
-  locale_print "正在初始化服务…" "Initializing services..."
+  print_loc "更新中…" "Updating..."
+  ui_print " ↴"
+  printl
+  printe
+  print_loc "正在初始化服务…" "Initializing services..."
   /data/adb/box_bll/scripts/box.service stop > /dev/null 2>&1
   sleep 1.5
-    
+  printe
   if [ "$INSTALL_TILE_APK" = true ] || [ -d "$SURFING_TILE_DIR_UPDATE" ]; then
     install_surfingtile_module
   else
@@ -293,23 +333,30 @@ if [ -d /data/adb/box_bll ]; then
   choose_to_umount_hosts_file
   
   sleep 1
-  locale_print "正在重启服务…" "Restarting service..."
+  printl
+  printe
+  print_loc "正在重启服务…" "Restarting service..."
   /data/adb/box_bll/scripts/box.service start > /dev/null 2>&1
-  locale_print "更新完成，无需重启" "Update completed. No need to reboot."
+  print_loc "更新完成，无需重启" "Update completed. No need to reboot."
+  printe
 else
-  locale_print "正在安装…" "Installing..."
-  ui_print "↴"
+  print_loc "安装中…" "Installing..."
+  ui_print " ↴"
   mv "$MODPATH/box_bll" /data/adb/
   choose_to_install_surfingtile_module
   choose_to_install_Web_apk
-  locale_print "模块安装完毕。工作目录为：" "Module installation completed. Working directory:"
-  ui_print "/data/adb/box_bll/"
-  locale_print "请在该工作目录下添加" "Please add your subscription to"
-  locale_print "你的订阅至 config.yaml" "config.yaml under the working directory"
-  locale_print "首次安装完成后需要重启" "A reboot is required after first installation..."
-  locale_print "请按照顺序执行步骤" "Please follow the steps in order"
-  
   choose_to_umount_hosts_file
+  printl
+  printe
+  print_loc "模块安装完毕，工作目录为：" "Module installation completed. Working directory:"
+  printe
+  ui_print " /data/adb/box_bll/"
+  printe
+  print_loc "请在该工作目录下的 config.yaml" "Please add your subscription to"
+  print_loc "添加你的订阅" "config.yaml under the working directory"
+  printe
+  print_loc "首次安装完成后需要重启" "A reboot is required after first installation..."
+  printe
   
 fi
 
