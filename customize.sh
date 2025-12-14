@@ -157,6 +157,18 @@ install_surfingtile_module() {
 
   cp -f "$SURFING_TILE_DIR/module.prop" "$SURFING_TILE_DIR_UPDATE"
   touch "$SURFING_TILE_DIR_UPDATE/update"
+
+  if [ "$KSU" = true ] && [ "$KSU_VER_CODE" -ge 22098 ]; then
+      printe
+      print_loc "检测到当前 KernelSU 版本使用了元模块功能" "Detect current KernelSU is using meta-module feature"
+      print_loc "如果你使用 SurfingTile 模块" "Make sure you have installed meta-module"
+      print_loc "请务必确保已安装元模块!" "if you use SurfingTile module!"
+      printe
+      print_loc "注意：若你不知道元模块是什么" "NOTICE: If you don’t know what is meta-module,"
+      print_loc "请查阅 KernelSU 官方网站" "please check KernelSU official website."
+      printe
+  fi
+
 }
 
 choose_volume_key() {
