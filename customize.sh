@@ -28,26 +28,38 @@ else
   INSTALL_TILE=false
 fi
 
-detect_language() {
-  sys_locale=$(getprop ro.product.locale 2>/dev/null)
-  if [ -z "$sys_locale" ]; then
-    sys_locale=$(getprop persist.sys.locale 2>/dev/null)
+# 语言选择函数
+choose_language() {
+  ui_print ""
+  ui_print "=========================================="
+  ui_print "  Please choose language / 请选择语言"
+  ui_print "  音量 +  Volume Up: English (default)"
+  ui_print "  音量 -  Volume Down: 中文"
+  ui_print "=========================================="
+  
+  timeout_seconds=10
+  ui_print "Waiting for input (10s)... / 等待输入（10秒）..."
+  
+  read -r -t $timeout_seconds line < <(getevent -ql | awk '/KEY_VOLUME/ {print; exit}')
+  
+  if [ $? -eq 142 ]; then
+    ui_print "No input detected. Using English as default."
+    ui_print "未检测到输入，默认使用英文。"
+    export LANG="en"
+    return
   fi
-  if [ -z "$sys_locale" ]; then
-    sys_locale="en"
+  
+  if echo "$line" | grep -q "KEY_VOLUMEDOWN"; then
+    export LANG="zh"
+    ui_print "已选择：中文"
+  else
+    export LANG="en"
+    ui_print "Selected: English"
   fi
-
-  case "$sys_locale" in
-    zh*|ZH*)
-      export LANG="zh"
-      ;;
-    *)
-      export LANG="en"
-      ;;
-  esac
 }
 
-detect_language
+# 先执行语言选择
+choose_language
 
 _( ) {
   case "$LANG" in
@@ -90,10 +102,10 @@ _( ) {
           echo "是否将 hosts 文件挂载到系统？"
           ;;
         "Volume Up: Mount")
-          echo "音量+：挂载"
+          echo "音量 + 挂载"
           ;;
         "Volume Down: Uninstall (default)")
-          echo "音量-：卸载（默认）"
+          echo "音量 - 卸载（默认）"
           ;;
         "Hosts file mounted")
           echo "hosts 文件已挂载"
@@ -142,6 +154,27 @@ _( ) {
           ;;
         "No input detected. Running default option...")
           echo "未检测到输入，执行默认选项..."
+          ;;
+        "Restarting service...")
+          echo "正在重启服务..."
+          ;;
+        "Please choose language / 请选择语言")
+          echo "请选择语言"
+          ;;
+        "Volume Up: English (default)")
+          echo "音量+：英文（默认）"
+          ;;
+        "Volume Down: 中文")
+          echo "音量-：中文"
+          ;;
+        "No input detected. Using English as default.")
+          echo "未检测到输入，默认使用英文。"
+          ;;
+        "Selected: English")
+          echo "已选择：英文"
+          ;;
+        "Selected: 中文")
+          echo "已选择：中文"
           ;;
         *)
           echo "$1"
