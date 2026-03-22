@@ -1,21 +1,18 @@
 推送通知: 开
 启动弹窗: 开
-菜单标题: 数据变更
-发布标识: 20260322_01
+菜单标题: 一条通知
+发布标识: 20260322_02
 
-内容标题: com.android64bit.web
+内容标题: 关于当前应用 Web app
 内容居中: 开
 信息内容: {
-关于 当前应用 Web app
-已逐步逐渐进入弃用状态
-请卸载完全迁移至
+已逐步逐渐进入弃用状态，如需使用，请卸载完全迁移至
 
 SurfingTile
 
-[https://picui.ogmua.cn/s1/2026/03/22/69bfe8780326f.webp]
+[https://picui.ogmua.cn/s1/2026/03/22/69bfeb0a4e0ca.webp]
 包名: com.surfing.tile
 下载地址请进公群
-
 }
 
 按钮标题: 确定
