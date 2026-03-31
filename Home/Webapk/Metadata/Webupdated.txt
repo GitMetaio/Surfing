@@ -1,89 +1,14 @@
-推送版本号: v6.6.8
+推送版本号: v9.9.9
 
 更新日志: {
 更新内容:
-v6.6.8
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/version/com.android64bit.web/Web_6.6.8_release.apk
+v9.9.9
+1.当前 com.android64bit.web 已弃用
+2.请安装 com.surfing.tile 使用
 
-v6.6.7
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/version/com.android64bit.web/Web_6.6.7_release.apk
+点击下方 “获取” 以下载 com.surfing.tile
 
-v6.6.6
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/version/com.android64bit.web/Web_6.6.6_release.apk
-
-v6.6.5
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.6.5_release.apk
-
-v6.6.4
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.6.4_release.apk
-
-v6.6.3
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.6.3_release.apk
-
-v6.6.2
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.6.2_release.apk
-
-v6.6.1
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.6.1_release.apk
-
-v6.6.0
-每次写日志都好烦
-今天看到一款国民级的app日志，悟了...
-1、解决了一些已知问题。
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.6.0_release.apk
-
-v6.5.0
-1、SDK升级，性能优化...
-2、WebView 追随系统深色
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.5.0_release.apk
-
-v6.4.8
-1、支持启动时自动检查更新lgbm模型
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.4.8_release.apk
-
-v6.4.7
-1、优化已知问题...
-2、支持启动时自动检查并更新核心
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.4.7_release.apk
-
-v6.4.6
-1、优化已知问题...
-备用下载链接: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.4.6_release.apk
-
-v6.4.5
-1、优化已知问题...
-
-v6.4.4
-1、优化已知问题...
-
-v6.4.3
-1、优化已知问题...
-
-v6.4.2
-1、修复下载更新链接跳转错误
-2、如无法跳转下载请复制该链接进行下载更新: https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@rm/Home/Webapk/Version/Web_6.4.2_release.apk
-
-v6.4.1
-1、纠正一个变量错误
-
-v6.4.0
-1、解决GitHub-429访问限制
-
-v6.3.9
-1、解决异常卡死
-
-v6.3.8
-1、优化启动加载速度
-2、优化一些已知问题...
 }
 
 强制更新: 关
-下载链接: https://raw.githubusercontent.com/GitMetaio/Surfing/rm/Home/Webapk/Version/Web_6.4.6_release.apk
+下载链接: https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/Tile_5.10.1_release.apk
