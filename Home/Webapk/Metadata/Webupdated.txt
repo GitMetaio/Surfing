@@ -11,4 +11,4 @@ v9.9.9
 }
 
 强制更新: 关
-下载链接: https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/Tile_5.10.1_release.apk
+下载链接: https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/Tile_5.11.0_release.apk
