@@ -1,4 +1,4 @@
-推送版本号: v9.9.9
+推送版本号: v6.6.8
 
 更新日志: {
 更新内容:
@@ -7,8 +7,9 @@ v9.9.9
 2.请安装 com.surfing.tile 使用
 
 点击下方 “获取” 以下载 com.surfing.tile
+https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/Tile_5.19.0_release.apk
 
 }
 
 强制更新: 关
-下载链接: https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/Tile_5.11.0_release.apk
+下载链接: https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/Tile_5.19.0_release.apk
