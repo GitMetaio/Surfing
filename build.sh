@@ -97,6 +97,7 @@ zip -r -o -X "$filename" ./ \
     -x '.github/*' \
     -x 'folder/*' \
     -x 'build.sh' \
+    -x 'stats.json' \
     -x 'Surfing.json' \
 
 echo "Build Completed: $filename"

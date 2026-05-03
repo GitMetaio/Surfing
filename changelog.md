@@ -3,7 +3,6 @@
 - improve the stability of tun interface creation
 - improve the iptables transparent proxy check
 - optimize iptables performance limitations on the system kernel
-- brand new surfingtile client v5.22.0
 
 # v7.7.0
 - optimize iptables rule chain
