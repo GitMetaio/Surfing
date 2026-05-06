@@ -185,7 +185,6 @@ if [ -d "$BOX_BLL_PATH" ]; then
   cp "$BOX_BLL_PATH/clash/config.yaml" "$BOX_BLL_PATH/clash/config.yaml.bak"
   cp "$BOX_BLL_PATH/scripts/box.config" "$BOX_BLL_PATH/scripts/box.config.bak"
   cp -f "$MODPATH/box_bll/clash/config.yaml" "$BOX_BLL_PATH/clash/"
-  cp -f "$MODPATH/box_bll/clash/Toolbox.sh" "$BOX_BLL_PATH/clash/"
   cp -f "$MODPATH/box_bll/scripts/"* "$BOX_BLL_PATH/scripts/"
   
   OLD_CONFIG="$BOX_BLL_PATH/scripts/box.config.bak"
