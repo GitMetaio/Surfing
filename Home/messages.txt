@@ -3,6 +3,7 @@ SURFING_QUOTES = {
   "Tips: 右上角可以切换过滤模式 核心TUN / 模块Tproxy",
   "Tips: 如状态栏磁贴不可用，请检查 SurfingTile 是否为系统应用",
   "Tips: 在主页长按 Logo 可开启流光背景",
+  "Tips: 订阅管理里面需要返回到上一层级保存哦",
 }
 
 GREETINGS = {
