@@ -1,5 +1,5 @@
 {
-  "versionName": "v5.29.0",
+  "versionName": "v5.30.0",
   "changelog": [
     "🚀 【重磅更新】",
     "- 核心网络模块重构，降低了 30% 的延迟",
