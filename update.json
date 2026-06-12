@@ -1,17 +1,26 @@
-{
-  "versionName": "v5.30.0",
-  "changelog": [
-    "🚀 【重磅更新】",
-    "- 核心网络模块重构，降低了 30% 的延迟",
-    "- 适配 Android 15 系统特性",
-    "",
-    "🛠️ 【修复与优化】",
-    "- 修复了在部分机型上通知栏图标显示异常的问题",
-    "- 优化了后台常驻服务的电量消耗",
-    "",
-    "📢 【温馨提示】",
-    "建议所有用户更新以获得最佳体验。"
-  ],
-  "downloadUrl": "https://ghproxy.cn/https://github.com/GitMetaio/Surfing/app/version/com.surfing.tile/SurfingTile_5.29.0_release.apk",
-  "fileSize": 12582912
-}
+[
+  {
+    "versionName": "v5.30.0",
+    "changelog": [
+      "- 核心网络模块重构，降低了 30% 的延迟",
+      "- 适配 Android 15 系统特性",
+      "",
+      "【修复与优化】",
+      "- 修复了在部分机型上通知栏图标显示异常的问题",
+      "- 优化了后台常驻服务的电量消耗",
+      "",
+      "【温馨提示】",
+      "更新以获得最佳体验。"
+    ],
+    "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_v.{VER}_release.apk",
+    "fileSize": 12582912
+  },
+  {
+    "versionName": "v5.29.0",
+    "changelog": [
+      "- 修复了已知稳定性问题"
+    ],
+    "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_v.{VER}_release.apk",
+    "fileSize": 12000000
+  }
+]
