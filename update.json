@@ -12,7 +12,7 @@
       "【温馨提示】",
       "更新以获得最佳体验。"
     ],
-    "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_v.{VER}_release.apk",
+    "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_v{VER}_release.apk",
     "fileSize": 12582912
   },
   {
@@ -20,7 +20,7 @@
     "changelog": [
       "- 修复了已知稳定性问题"
     ],
-    "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_v.{VER}_release.apk",
+    "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_v{VER}_release.apk",
     "fileSize": 12000000
   }
 ]
