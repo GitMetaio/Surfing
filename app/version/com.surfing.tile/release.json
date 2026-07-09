@@ -1,5 +1,14 @@
 [
     {
+        "versionName": "v5.35.2",
+        "changelog": [
+            "修复已知问题，提升稳定性"
+        ],
+        "fileSize": 8385162,
+        "sha256": "5173a3710ae960bc8108779c85bb54ae64b3079d80068c8ab612c847e94d787f",
+        "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_{VER}_release.apk"
+    },
+    {
         "versionName": "v5.35.1",
         "changelog": [
             "修复已知问题，提升稳定性"
