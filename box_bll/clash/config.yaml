@@ -483,6 +483,7 @@ rules:
   - DST-PORT,853,DNS连接
   - RULE-SET,自定义规则,特殊地址
   - RULE-SET,WebRTC_端/域,WebRTC
+  - RULE-SET,GoogleFCM_域,GoogleFCM
   - RULE-SET,YouTube_域,YouTube
   - RULE-SET,Google_域,Google
   - RULE-SET,Google_IP,Google,no-resolve
@@ -500,7 +501,6 @@ rules:
   - RULE-SET,TikTok_域,TikTok
   - RULE-SET,Twitter_域,Twitter(X)
   - RULE-SET,Twitter_IP,Twitter(X),no-resolve
-  - RULE-SET,GoogleFCM_域,GoogleFCM
   - RULE-SET,Netflix_域,Netflix
   - RULE-SET,Netflix_IP,Netflix,no-resolve
   - RULE-SET,Spotify_域,Spotify
