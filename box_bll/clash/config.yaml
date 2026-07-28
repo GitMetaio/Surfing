@@ -306,27 +306,28 @@ proxy-groups:
     <<: *A
   - name: ALL·日本地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/JP.svg"
-    filter: "^(?=.*(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan)).*$"
+    filter: "(?i)(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|jp|japan)"
     <<: *All
   - name: ALL·中国台湾
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/CN.svg"
-    filter: "^(?=.*(台|新北|彰化|TW|Taiwan|taipei)).*$"
+    filter: "(?i)(台|新北|彰化|tw|taiwan|taipei)"
     <<: *All
   - name: ALL·香港地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/HK.svg"
-    filter: "^(?=.*(港|HK|hk|Hong Kong|HongKong|hongkong)).*$"
+    filter: "(?i)(港|hk|hong ?kong)"
     <<: *All
   - name: ALL·美国地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/US.svg"
-    filter: "^(?=.*(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States)).*$"
+    filter: "(?i)(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|us|united ?states)"
     <<: *All
   - name: ALL·狮城地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/Singapore.svg"
-    filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"
+    filter: "(?i)(新加坡|坡|狮城|sg|singapore)"
     <<: *All
   - name: ALL·其它地区
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/Globe.svg"
-    filter: "^(?!.*(港|HK|hk|Hong Kong|HongKong|hongkong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|JP|Japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States|台|新北|彰化|TW|Taiwan|新加坡|坡|狮城|SG|Singapore|灾|网易|Netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|DNS|Ch|网址|售|防失)).*$"
+    filter: ".*"
+    exclude-filter: "(?i)(港|hk|hong ?kong|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|[^-]日|jp|japan|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|us|united ?states|台|新北|彰化|tw|taiwan|taipei|新加坡|坡|狮城|sg|singapore|灾|网易|netease|套餐|重置|剩余|到期|订阅|群|账户|流量|有效期|时间|官网|拒绝|dns|ch|网址|售|防失)"
     <<: *All
   - name: 特殊地址
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/User.svg"
