@@ -1,4 +1,8 @@
 # —————————
+# ==== Tips
+# 1. 修改配置文件保存时，需要重启服务/重载配置以生效.
+# 2. 如使用 SurfingTile 的配置覆写，当前配置文件的某些字段应保持原有的完整性结构，只新增不改旧原则
+# 3. “proxy-groups” 该代理组 “总模式” 位于 SurfingTile 覆写匹配字段，多语言用户可更改 “name” 为 "TotalMode","Total Mode","GlobalMode","Global Mode","Общий режим" 支持大小写。或者使用图标URL “/All.svg” 对该组覆写
 # 基础设置
 mixed-port: 7890
 redir-port: 7891
@@ -23,10 +27,6 @@ external-controller: 0.0.0.0:9090 #修改端口后，如使用磁贴请重新正
 external-ui-url: "https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip"
 external-ui: "./webroot/Zash/"
 secret: "" # 面板访问密码，如在公网访问建议设置
-# —————————
-# ==== Tips
-# 1. 修改配置文件保存时，建议重启服务/重载配置.
-# 2. 如使用 SurfingTile 的配置覆写，当前配置文件的某些字段应保持原有的完整性结构
 # —————————
 # 健康检查
 p: &p
