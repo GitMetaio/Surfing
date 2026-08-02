@@ -156,6 +156,12 @@ start_redirect() {
       done
       log Info "代理模式: [白名单] 已接管指定范围内的应用."
     fi
+    if [ "${#gid_list[@]}" -ne 0 ]; then
+      for gid in "${gid_list[@]}" ; do
+        ${iptables} -t nat -A BOX_LOCAL -p tcp -m owner --gid-owner "${gid}" -j REDIRECT --to-ports "${redir_port}"
+      done
+      log Info "权限过滤: 已接管 GID [${gid_list[*]}]."
+    fi
   else
     ${iptables} -t nat -A BOX_LOCAL -p tcp -j REDIRECT --to-ports "${redir_port}"
   fi
@@ -308,6 +314,12 @@ start_tproxy() {
   fi
 
   if [ "${proxy_mode}" = "blacklist" ]; then
+    if [ "${#gid_list[@]}" -ne 0 ]; then
+      for gid in "${gid_list[@]}" ; do
+        ${iptables} -t mangle -A BOX_LOCAL -m owner --gid-owner "${gid}" -j RETURN
+      done
+      [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "权限过滤: 已绕过 GID [${gid_list[*]}]."
+    fi
     if [ "${#uid_list[@]}" -eq 0 ]; then
       ${iptables} -t mangle -A BOX_LOCAL -p tcp -j MARK --set-xmark "${mark_id}"
       ${iptables} -t mangle -A BOX_LOCAL -p udp -j MARK --set-xmark "${mark_id}"
@@ -330,6 +342,13 @@ start_tproxy() {
         ${iptables} -t mangle -A BOX_LOCAL -p udp -m owner --uid-owner "${appid}" -j MARK --set-xmark "${mark_id}"
       done
       [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "代理模式: [白名单] 已接管指定范围内的应用."
+    fi
+    if [ "${#gid_list[@]}" -ne 0 ]; then
+      for gid in "${gid_list[@]}" ; do
+        ${iptables} -t mangle -A BOX_LOCAL -p tcp -m owner --gid-owner "${gid}" -j MARK --set-xmark "${mark_id}"
+        ${iptables} -t mangle -A BOX_LOCAL -p udp -m owner --gid-owner "${gid}" -j MARK --set-xmark "${mark_id}"
+      done
+      [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "权限过滤: 已接管 GID [${gid_list[*]}]."
     fi
   fi
 
