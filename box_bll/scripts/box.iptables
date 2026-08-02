@@ -259,8 +259,8 @@ start_tproxy() {
   ${iptables} -t mangle -A BOX_EXTERNAL -m socket -j RETURN
 
   if [ "${iptables}" = "${SYS_IP6TABLES} -w 100" ]; then
+    ${iptables} -t mangle -A BOX_EXTERNAL -s fe80::/10 -j RETURN
     for subnet6 in "${intranet6[@]}" ; do
-      ${iptables} -t mangle -A BOX_EXTERNAL -s "${subnet6}" -j RETURN
       ${iptables} -t mangle -A BOX_EXTERNAL -d "${subnet6}" -p udp ! --dport 53 -j RETURN
       ${iptables} -t mangle -A BOX_EXTERNAL -d "${subnet6}" ! -p udp -j RETURN
     done
@@ -300,8 +300,8 @@ start_tproxy() {
   fi
 
   if [ "${iptables}" = "${SYS_IP6TABLES} -w 100" ]; then
+    ${iptables} -t mangle -A BOX_LOCAL -s fe80::/10 -j RETURN
     for subnet6 in "${intranet6[@]}" ; do
-      ${iptables} -t mangle -A BOX_LOCAL -s "${subnet6}" -j RETURN
       ${iptables} -t mangle -A BOX_LOCAL -d "${subnet6}" -p udp ! --dport 53 -j RETURN
       ${iptables} -t mangle -A BOX_LOCAL -d "${subnet6}" ! -p udp -j RETURN
     done
