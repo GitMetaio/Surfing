@@ -1,3 +1,13 @@
+# v7.8.3
+### 🛠️ Iptables
+- Fix proxy list truncation caused by duplicate entries in `packages.list`
+- Fix network loop issues when enabling hotspot in environments without public IPv6 support
+- Refine GID filtering logic for TPROXY and REDIRECT modes
+
+### 📦 Dependencies & Others
+- chore: Update default Clash configuration
+- chore(apks): Update SurfingTile to v5.38.1
+
 # v7.8.2
 - sync latest branch
 - fix known issues and improve stability
