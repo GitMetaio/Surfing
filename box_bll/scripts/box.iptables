@@ -73,7 +73,13 @@ find_packages_uid() {
   for user_package in "${user_packages_list[@]}" ; do
     user=$(echo "${user_package}" | awk -F ':' '{print $1}')
     package=$(echo "${user_package}" | awk -F ':' '{print $2}')
-    uid="$(awk '{if($1=="'${package}'"){print $2}}' /data/system/packages.list)"
+    uid="$(awk -v target="${package}" '$1 == target {print $2; exit}' /data/system/packages.list)"
+    case "$uid" in
+      ''|*[!0-9]*)
+        log Warn "UID 解析: 无法获取 [${package}] 的有效 UID，已跳过接管."
+        continue
+        ;;
+    esac
     if [ -n "${uid}" ]; then
       uid_list[${#uid_list[@]}]=$((user * 100000 + uid))
     fi
