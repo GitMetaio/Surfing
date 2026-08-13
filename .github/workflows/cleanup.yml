@@ -1,53 +1,76 @@
-name: auto task
+name: Maintenance
+run-name: ${{ github.event.head_commit.message || 'Scheduled Actions Cleanup' }}
 
 on:
-  workflow_run:
-    workflows: ["prerelease", "release"]
-    types:
-      - completed
   workflow_dispatch:
+  schedule:
+    - cron: '0 16 * * *'
+
+permissions:
+  contents: write
+  actions: write
 
 jobs:
-  cleanup-runs:
+  Cleanup-Runs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
 
     steps:
-      - name: Clean Workflow Runs
+      - name: Intelligent Cleanup
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" == "workflow_run" ]; then
-            echo "Triggering workflow succeeded. Deleting run ID: ${{ github.event.workflow_run.id }}"
-            curl -L -X DELETE \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
-          fi
-
-          echo "Starting total cleanup of all workflows..."
-          WORKFLOWS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows" \
-            | jq '.workflows[] | .id')
-
-          for wf in $WORKFLOWS; do
+          echo "Starting intelligent cleanup of historical runs..."
+          
+          # Get all workflows
+          WORKFLOWS_JSON=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows")
+          
+          # Process each workflow
+          echo "$WORKFLOWS_JSON" | jq -c '.workflows[]' | while read -r wf; do
+            wf_id=$(echo "$wf" | jq -r '.id')
+            wf_name=$(echo "$wf" | jq -r '.name')
+            
+            # Determine retention limit based on workflow name
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              limit=0
+              echo "Manual trigger: Indiscriminate cleanup enabled (Retention Limit: 0)"
+            else
+              case "$wf_name" in
+                "Release") limit=7 ;;
+                "Alpha") limit=15 ;;
+                "Maintenance") limit=3 ;;
+                *) limit=5 ;;
+              esac
+            fi
+            
+            echo "--- Workflow: $wf_name (ID: $wf_id) ---"
+            echo "Retention Limit: $limit"
+            
+            # Fetch runs for this workflow, ordered newest to oldest
+            # We exclude the current running cleanup job to avoid self-deletion issues
             RUN_IDS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/$wf/runs?per_page=100" \
-              | jq ".workflow_runs[] | select(.id != ${{ github.run_id }}) | .id")
-
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/$wf_id/runs?per_page=100" \
+              | jq -r ".workflow_runs[] | select(.id != ${{ github.run_id }}) | .id")
+            
             if [ -z "$RUN_IDS" ]; then
+              echo "No runs found for this workflow."
               continue
             fi
 
+            count=0
             for run_id in $RUN_IDS; do
-              echo "Deleting historical run ID: $run_id"
-              curl -L -X DELETE \
-              -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+              count=$((count + 1))
+              if [ "$count" -gt "$limit" ]; then
+                echo "Deleting historical run (Index: $count, ID: $run_id)"
+                curl -s -L -X DELETE \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer $GITHUB_TOKEN" \
+                  "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+              else
+                echo "Keeping run (Index: $count, ID: $run_id)"
+              fi
             done
           done
 
           echo "Cleanup completed."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,4 @@
-name: release
+name: Release
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  Production-Build:
     runs-on: ubuntu-latest
 
     env:
@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -45,7 +45,7 @@ jobs:
           echo "CHANGELOG=release_notes.txt" >> $GITHUB_ENV
 
       - name: Upload Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: Surfing_${{ env.TAG_NAME }}_release.zip

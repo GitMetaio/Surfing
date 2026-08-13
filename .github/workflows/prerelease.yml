@@ -1,22 +1,22 @@
-name: prerelease
-run-name: ${{ github.event.head_commit.message || 'Scheduled Run' }}
+name: Alpha
+run-name: ${{ github.event.head_commit.message || 'Scheduled Stats Update' }}
 
 on:
   push:
     branches:
       - main
   schedule:
-    - cron: '0 18 * * *'
+    - cron: '0 */12 * * *'
 
 permissions:
   contents: write
 
 jobs:
-  update-stats:
+  Fetch-Data:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Data Branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: data
 
@@ -62,8 +62,8 @@ jobs:
           git commit -m "chore: sync download metrics to data" || exit 0
           git push origin data
 
-  build-alpha:
-    needs: update-stats
+  Prerelease-Build:
+    needs: Fetch-Data
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           ref: main
@@ -89,19 +89,18 @@ jobs:
         run: sh build.sh
 
       - name: Delete current prerelease assets
-        uses: andreaswilli/delete-release-assets-action@v4.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: Prerelease-Alpha
-          deleteOnlyFromDrafts: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view Prerelease-Alpha --json assets --jq '.assets[].name' | xargs -I {} gh release delete-asset Prerelease-Alpha "{}" -y || echo "No assets to delete"
 
       - name: Tag Repo
-        uses: richardsimko/update-tag@v1
+        uses: richardsimko/update-tag@v3
         with:
           tag_name: Prerelease-Alpha
 
       - name: Upload Prerelease
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: success()
         with:
           tag_name: Prerelease-Alpha
