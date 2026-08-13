@@ -212,21 +212,22 @@ Android user group IDs:
 #
 
 <details>
-<summary>6. SurfingTile App</summary>
+<summary>6. SurfingTile</summary>
 
-### Quick Settings Tile Service
-
+### APP Service
 ### 📱 Device Requirements
 > Supports Android 10+
 
 - Must run in **system space** and require **Root** permission
 - For **KSU** users, you need to install the **"Meta Module"** to obtain mount permissions
 - The tile works entirely based on the **Clash API**, please check if the API settings are correct
-  - **Path:** → Web App → Menu → Tile Settings
+  - **Path:** → Home Settings → More Settings → Port Settings
 
-- **Partial workflow diagrams**  
-  <img src="folder/SurfingTileService.svg" style="width:60%">
-  <img src="folder/SurfingTileAppFilter.svg" style="width:60%">
+### Hidden Easter Egg
+> Long press the home icon to toggle **Gold Privilege**
+
+- Preview
+  ![App Interface](folder/IMG_20260813_032529.jpg)
 
 </details>
 

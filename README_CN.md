@@ -204,18 +204,20 @@
 <details>
 <summary>6. SurfingTile</summary>
 
-### Quick Settings Tile Service
+### APP Service
 ### 📱设备要求
 > 支持 Android10+
 
 - 需要工作在**系统空间**，并且持有 **Root** 权限
 - 对于 **KSU** 用户，则需要安装 **"元模块"** 才能拥有挂载权限
 - 磁贴全程围绕 **Clash API** 工作，请检查 API 设置是否正确
-  - **路径:** → Web App → 菜单 → 磁贴设置
+  - **路径:** → 主页设置 → 更多设置 → 端口设置
 
-- **部分工作路径示意**  
-  <img src="folder/SurfingTileService.svg" style="width:60%">
-  <img src="folder/SurfingTileAppFilter.svg" style="width:60%">
+### 隐藏彩蛋
+> 通过长按首页图标 开启/关闭 **金牌特权**
+
+- 预览
+  ![程序界面](folder/IMG_20260813_032529.jpg)
 
 </details>
 
