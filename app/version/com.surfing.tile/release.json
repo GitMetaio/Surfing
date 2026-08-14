@@ -1,8 +1,8 @@
 [
     {
-        "versionName": "v5.38.1",
+        "versionName": "v5.38.2",
         "changelog": [
-            "Build Timestamp: 2026-08-13 07:33:39",
+            "Build Timestamp: 2026-08-15 03:30:28",
             "",
             "【UI 界面】",
             "优化 字体显示字重，文字层级更清晰",
@@ -33,8 +33,8 @@
             "【DEBUG】",
             "修复已知问题，提升稳定性"
         ],
-        "fileSize": 9313583,
-        "sha256": "091353b7c5f5441d92f90db88270776d04a479f7ae791e14a72b15d0a7754a37",
+        "fileSize": 9329807,
+        "sha256": "885221203cdb2125c7170cc1744a606e2b8e2ab9a900c8de9b7d840eb49f89e3",
         "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.surfing.tile/SurfingTile_{VER}_release.apk"
     },
     {
