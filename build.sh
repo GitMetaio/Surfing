@@ -64,16 +64,17 @@ else
 fi
 
 APK_DIR="app/version/com.surfing.tile"
-TILE_DST="SurfingTile/system/app/com.surfing.tile"
-TILE_PROP="SurfingTile/module.prop"
+TILE_ZIP="SurfingTile.zip"
+TILE_STAGE=".tile_stage"
 
-mkdir -p "$TILE_DST"
+rm -rf "$TILE_STAGE" "$TILE_ZIP"
+mkdir -p "$TILE_STAGE"
 latest_apk=$(find "$APK_DIR" -maxdepth 1 -name "SurfingTile_*_release.apk" 2>/dev/null | sort -V | tail -n 1)
 if [ -f "$latest_apk" ]; then
-    tile_version=$(basename "$latest_apk" | sed -E 's/^SurfingTile_(.*)_release\.apk$/\1/')
-    cp -f "$latest_apk" "$TILE_DST/com.surfing.tile.apk"
-    sed -i "s/^version=.*/version=v$tile_version/" "$TILE_PROP"
+    cp -f "$latest_apk" "$TILE_STAGE/com.surfing.tile.apk"
+    (cd "$TILE_STAGE" && zip -r -o -X "../$TILE_ZIP" ./*)
 fi
+rm -rf "$TILE_STAGE"
 
 version=$(grep '^version=' module.prop | awk -F '=' '{print $2}' | sed 's/ (.*//')
 short_hash=${SHORT_HASH:-$(git rev-parse --short=7 HEAD)}
@@ -88,10 +89,7 @@ fi
 
 sed -i "s/^version=.*/version=${new_version}/" module.prop
 
-(cd SurfingTile && zip -r -o -X ../SurfingTile.zip ./*)
-
 zip -r -o -X "$filename" ./ \
-    -x 'SurfingTile/*' \
     -x 'app/*' \
     -x '.git/*' \
     -x '.github/*' \
