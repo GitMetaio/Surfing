@@ -91,39 +91,3 @@ handle_inotify_event() {
     fi
 }
 handle_inotify_event
-
-sync_tile_version_to_module() {
-    PKG="com.surfing.tile"
-    MODULE_PROP="/data/adb/modules/SurfingTile/module.prop"
-
-    [ ! -f "$MODULE_PROP" ] && return 0
-
-    eval $(dumpsys package "$PKG" 2>/dev/null | awk '
-        /versionName=/ && !vn { vn=$0; sub(/.*versionName=/, "", vn) }
-        /versionCode=/ && !vc { vc=$0; sub(/.*versionCode=/, "", vc); sub(/ .*/, "", vc) }
-        vn && vc { printf "versionName=\"%s\";versionCode=\"%s\"\n", vn, vc; exit }
-    ')
-
-    [ -z "$versionName" ] && return 0
-    sed -i -e "s|^version=.*|version=[😋 User APK v${versionName}]|" \
-           -e "s|^versionCode=.*|versionCode=${versionCode}|" "$MODULE_PROP"
-}
-
-handle_packages_event() {
-    [ "$MONITOR_FILE" != "packages.xml" ] && return
-    case "$EVENT" in
-        m|c)
-            local lock_file="/dev/tmp/packages_inotify.lock"
-            local current_time=$(date +%s)
-            if [ -f "$lock_file" ]; then
-                read last_time < "$lock_file"
-                [ $((current_time - last_time)) -lt 10 ] && return 0
-            fi
-            echo "$current_time" > "$lock_file"
-            
-            sleep 3 
-            sync_tile_version_to_module
-            ;;
-    esac
-}
-handle_packages_event
