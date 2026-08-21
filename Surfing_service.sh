@@ -6,7 +6,6 @@ BASE_MODULES_DIR="/data/adb/modules"
 [ -n "$(magisk -v | grep lite)" ] && BASE_MODULES_DIR="/data/adb/lite_modules"
 
 SURFING_DIR="${BASE_MODULES_DIR}/Surfing"
-SURFING_TILE_DIR="${BASE_MODULES_DIR}/SurfingTile"
 SCRIPTS_DIR="/data/adb/box_bll/scripts"
 
 (
@@ -49,10 +48,6 @@ done
 safe_inotifyd "${SCRIPTS_DIR}/net.inotify" "$NET_DIR"
 safe_inotifyd "${SCRIPTS_DIR}/ctr.inotify" "$CTR_FILE"
 ) &
-
-if [ -d "$SURFING_TILE_DIR" ] && [ -f "$SURFING_TILE_DIR/module.prop" ]; then
-    safe_inotifyd "${SCRIPTS_DIR}/box.inotify" "/data/system"
-fi
 
 delete_op_coloros16_fw_rules() {
     brand=$(getprop ro.product.brand | tr '[:upper:]' '[:lower:]')
