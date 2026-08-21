@@ -4,9 +4,8 @@ SKIPUNZIP=1
 ASH_STANDALONE=1
 
 CURRENT_MODULES_DIR="/data/adb/modules"
-UPDATE_MODULES_DIR="/data/adb/modules_update"
 
-magisk -v | grep -q lite && CURRENT_MODULES_DIR="/data/adb/lite_modules" && UPDATE_MODULES_DIR="/data/adb/lite_modules_update"
+magisk -v | grep -q lite && CURRENT_MODULES_DIR="/data/adb/lite_modules"
 
 SURFING_PATH="$CURRENT_MODULES_DIR/Surfing"
 BOX_BLL_PATH="/data/adb/box_bll"
@@ -23,18 +22,6 @@ HOSTS_PATH="$BOX_BLL_PATH/clash/etc"
 HOSTS_BACKUP="$BOX_BLL_PATH/clash/etc/hosts.bak"
 
 SURFING_TILE_ZIP="$MODPATH/SurfingTile.zip"
-CURRENT_SURFING_TILE_DIR="$CURRENT_MODULES_DIR/SurfingTile"
-UPDATE_SURFING_TILE_DIR="$UPDATE_MODULES_DIR/SurfingTile"
-
-MODULE_PROP_PATH="$CURRENT_MODULES_DIR/Surfing/module.prop"
-MODULE_VERSION_CODE=0
-[ -f "$MODULE_PROP_PATH" ] && MODULE_VERSION_CODE=$(awk -F'=' '/versionCode/ {print $2}' "$MODULE_PROP_PATH")
-
-if [ "$MODULE_VERSION_CODE" -lt 1647 ]; then
-  INSTALL_TILE=true
-else
-  INSTALL_TILE=false
-fi
 
 init_busybox_toolchain() {
   chmod 755 "$BIN_PATH/busybox"
@@ -78,10 +65,10 @@ restore_subscribe_urls() {
 }
 
 install_surfingtile_apk() {
-  APK_SRC="$UPDATE_SURFING_TILE_DIR/system/app/com.surfing.tile/com.surfing.tile.apk"
   APK_TMP="$INSTALL_DIR/com.surfing.tile.apk"
-  if [ -f "$APK_SRC" ]; then
-    cp "$APK_SRC" "$APK_TMP"
+  rm -f "$APK_TMP"
+  unzip -o "$SURFING_TILE_ZIP" "com.surfing.tile.apk" -d "$INSTALL_DIR" >/dev/null 2>&1
+  if [ -f "$APK_TMP" ]; then
     ui_print "Installing Surfingtile APK..."
     pm install "$APK_TMP"
     rm -f "$APK_TMP"
@@ -90,32 +77,11 @@ install_surfingtile_apk() {
   fi
 }
 
-install_surfingtile_module() {
-  mkdir -p "$UPDATE_SURFING_TILE_DIR"
-  mkdir -p "$CURRENT_SURFING_TILE_DIR"
-  unzip -o "$SURFING_TILE_ZIP" -d "$UPDATE_SURFING_TILE_DIR" >/dev/null 2>&1
-  cp -f "$UPDATE_SURFING_TILE_DIR/module.prop" "$CURRENT_SURFING_TILE_DIR"
-  touch "$CURRENT_SURFING_TILE_DIR/update"
-}
-
 sync_version_from_module_prop() {
   dst_prop="$CURRENT_MODULES_DIR/Surfing/module.prop"
   if [ -f "$MODPATH/module.prop" ] && [ -d "$CURRENT_MODULES_DIR/Surfing" ]; then
     cp -f "$MODPATH/module.prop" "$dst_prop"
   fi
-}
-
-update_surfingtile_version_cache() {
-  CORE_VER=$(grep "^version=" "$MODPATH/module.prop" | sed -n 's/.*-\([0-9a-z]\{7\}\).*/\1/p')
-  [ -z "$CORE_VER" ] && return
-
-  PREFS_PATHS="/data/data/com.surfing.tile/shared_prefs/OverviewsPrefs.xml /data/user/0/com.surfing.tile/shared_prefs/OverviewsPrefs.xml"
-
-  for PREFS_FILE in $PREFS_PATHS; do
-    if [ -f "$PREFS_FILE" ]; then
-      sed -i "s/\(<string name=\"cached_core_version\">\)[^<]*\(<\/string>\)/\1$CORE_VER\2/g" "$PREFS_FILE"
-    fi
-  done
 }
 
 choose_volume_key() {
@@ -145,18 +111,6 @@ choose_to_umount_hosts_file() {
   fi
 }
 
-remove_old_surfingtile(){
-  rm -rf /data/adb/modules/Surfingtile 2>/dev/null
-  rm -rf /data/adb/modules_update/Surfingtile 2>/dev/null
-  rm -rf /data/adb/lite_modules/Surfingtile 2>/dev/null
-  rm -rf /data/adb/lite_modules_update/Surfingtile 2>/dev/null
-  rm -rf /data/adb/modules/Surfing_Tile 2>/dev/null
-  rm -rf /data/adb/modules_update/Surfing_Tile 2>/dev/null
-  rm -rf /data/adb/lite_modules/Surfing_Tile 2>/dev/null
-  rm -rf /data/adb/lite_modules_update/Surfing_Tile 2>/dev/null
-  pm uninstall "com.yadli.surfingtile" > /dev/null 2>&1 || pm uninstall --user 0 "com.yadli.surfingtile" > /dev/null 2>&1
-}
-
 if [ "$BOOTMODE" != true ]; then
   abort "Error: Please install via Magisk Manager / KernelSU Manager / APatch"
 elif [ "$KSU" = true ] && [ "$KSU_VER_CODE" -lt 10670 ]; then
@@ -172,7 +126,6 @@ fi
 
 unzip -qo "${ZIPFILE}" -x 'META-INF/*' -d "$MODPATH"
 
-remove_old_surfingtile
 sync_version_from_module_prop
 
 if [ -d "$BOX_BLL_PATH" ]; then
@@ -181,7 +134,7 @@ if [ -d "$BOX_BLL_PATH" ]; then
 
   cp -f "$MODPATH/box_bll/bin/busybox" "$BIN_PATH/busybox" && init_busybox_toolchain
 
-  [ "$INSTALL_TILE" = "true" ] && install_surfingtile_module && install_surfingtile_apk
+  install_surfingtile_apk
   extract_subscribe_urls
 
   [ -f "$HOSTS_FILE" ] && cp -f "$HOSTS_FILE" "$HOSTS_BACKUP"
@@ -219,7 +172,6 @@ if [ -d "$BOX_BLL_PATH" ]; then
   nohup inotifyd "${SCRIPTS_PATH}/box.inotify" "$SURFING_PATH" > /dev/null 2>&1 &
   nohup inotifyd "${SCRIPTS_PATH}/net.inotify" "$NET_PATH" > /dev/null 2>&1 &
   nohup inotifyd "${SCRIPTS_PATH}/ctr.inotify" "$CTR_PATH" > /dev/null 2>&1 &
-  [ -d "$CURRENT_SURFING_TILE_DIR" ] && inotifyd "${SCRIPTS_PATH}/box.inotify" "/data/system" >/dev/null 2>&1 &
 
   sleep 1
   cp -f "$MODPATH/box_bll/clash/etc/hosts" "$BOX_BLL_PATH/clash/etc/"
@@ -228,8 +180,6 @@ if [ -d "$BOX_BLL_PATH" ]; then
   rm -rf "$MODPATH/box_bll"
 
   choose_to_umount_hosts_file
-  update_surfingtile_version_cache
-  am broadcast -a com.surfing.tile.ACTION_SAVE_CONFIG -p com.surfing.tile >/dev/null 2>&1
   ui_print "Update completed."
 else
   ui_print "Installing..."
@@ -238,7 +188,6 @@ else
 
   init_busybox_toolchain
 
-  install_surfingtile_module
   install_surfingtile_apk
   ui_print "Module installation completed."
   choose_to_umount_hosts_file
@@ -248,7 +197,6 @@ mv -f "$MODPATH/Surfing_service.sh" "$service_dir/"
 rm -f "$SURFING_TILE_ZIP"
 
 set_perm_recursive "$MODPATH" 0 0 0755 0644
-set_perm_recursive "$UPDATE_SURFING_TILE_DIR" 0 0 0755 0644
 set_perm_recursive "$BOX_BLL_PATH" 0 3005 0755 0644
 
 set_perm_recursive "$BOX_BLL_PATH/scripts" 0 3005 0755 0700
