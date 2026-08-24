@@ -63,7 +63,7 @@ else
     echo "Error: Failed to fetch Zashboard version."
 fi
 
-APK_DIR="app/version/com.surfing.tile"
+APK_DIR="app/version/com.github.surfing"
 TILE_ZIP="SurfingTile.zip"
 TILE_STAGE=".tile_stage"
 
@@ -71,7 +71,7 @@ rm -rf "$TILE_STAGE" "$TILE_ZIP"
 mkdir -p "$TILE_STAGE"
 latest_apk=$(find "$APK_DIR" -maxdepth 1 -name "SurfingTile_*_release.apk" 2>/dev/null | sort -V | tail -n 1)
 if [ -f "$latest_apk" ]; then
-    cp -f "$latest_apk" "$TILE_STAGE/com.surfing.tile.apk"
+    cp -f "$latest_apk" "$TILE_STAGE/com.github.surfing.apk"
     (cd "$TILE_STAGE" && zip -r -o -X "../$TILE_ZIP" ./*)
 fi
 rm -rf "$TILE_STAGE"
