@@ -36,12 +36,12 @@ fi
 (
 sleep 1
 while true; do
-    if ! pm path com.surfing.tile >/dev/null 2>&1; then
+    if ! pm path com.github.surfing >/dev/null 2>&1; then
         break
     fi
     if service list 2>/dev/null | grep -q "activity"; then
-        if am broadcast -a com.surfing.tile.ACTION_WAKEUP_CLASH \
-                     -n com.surfing.tile/com.surfing.tile.service.BootReceiver \
+        if am broadcast -a com.github.surfing.ACTION_WAKEUP_CLASH \
+                     -n com.github.surfing/com.github.surfing.service.BootReceiver \
                      -f 0x01000020 2>&1 | grep -q "Broadcast completed"; then
             break
         fi
