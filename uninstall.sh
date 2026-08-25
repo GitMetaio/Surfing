@@ -62,6 +62,7 @@ while [ "$(getprop vold.decrypt)" = "1" ]; do
     sleep 2
 done
 
+uninstall_package "com.github.surfing"
 uninstall_package "com.surfing.tile"
 uninstall_package "com.yadli.surfingtile"
 uninstall_package "com.android64bit.web"
