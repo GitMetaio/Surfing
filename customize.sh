@@ -23,6 +23,16 @@ HOSTS_BACKUP="$BOX_BLL_PATH/clash/etc/hosts.bak"
 
 SURFING_TILE_ZIP="$MODPATH/SurfingTile.zip"
 
+MODULE_PROP_PATH="$CURRENT_MODULES_DIR/Surfing/module.prop"
+MODULE_VERSION_CODE=0
+[ -f "$MODULE_PROP_PATH" ] && MODULE_VERSION_CODE=$(awk -F'=' '/versionCode/ {print $2}' "$MODULE_PROP_PATH")
+
+if [ "$MODULE_VERSION_CODE" -lt 1653 ]; then
+  INSTALL_TILE=true
+else
+  INSTALL_TILE=false
+fi
+
 init_busybox_toolchain() {
   chmod 755 "$BIN_PATH/busybox"
   cd "$BIN_PATH" && find . -type l -delete && ./busybox --install -s . && cd "$MODPATH"
@@ -65,9 +75,9 @@ restore_subscribe_urls() {
 }
 
 install_surfingtile_apk() {
-  APK_TMP="$INSTALL_DIR/com.surfing.tile.apk"
+  APK_TMP="$INSTALL_DIR/com.github.surfing.apk"
   rm -f "$APK_TMP"
-  unzip -o "$SURFING_TILE_ZIP" "com.surfing.tile.apk" -d "$INSTALL_DIR" >/dev/null 2>&1
+  unzip -o "$SURFING_TILE_ZIP" "com.github.surfing.apk" -d "$INSTALL_DIR" >/dev/null 2>&1
   if [ -f "$APK_TMP" ]; then
     ui_print "Installing Surfingtile APK..."
     pm install "$APK_TMP"
@@ -126,15 +136,20 @@ fi
 
 unzip -qo "${ZIPFILE}" -x 'META-INF/*' -d "$MODPATH"
 
+remove_old_surfingtile() {
+  pm uninstall "com.surfing.tile" >/dev/null 2>&1 || pm uninstall --user 0 "com.surfing.tile" >/dev/null 2>&1
+  OLD_UNINSTALL="$CURRENT_MODULES_DIR/SurfingTile/uninstall.sh"
+  [ -f "$OLD_UNINSTALL" ] && sh "$OLD_UNINSTALL"
+}
+
 sync_version_from_module_prop
 
 if [ -d "$BOX_BLL_PATH" ]; then
   ui_print "Updating..."
   ui_print "↴"
 
+  [ "$INSTALL_TILE" = "true" ] && remove_old_surfingtile && install_surfingtile_apk
   cp -f "$MODPATH/box_bll/bin/busybox" "$BIN_PATH/busybox" && init_busybox_toolchain
-
-  install_surfingtile_apk
   extract_subscribe_urls
 
   [ -f "$HOSTS_FILE" ] && cp -f "$HOSTS_FILE" "$HOSTS_BACKUP"
@@ -143,7 +158,6 @@ if [ -d "$BOX_BLL_PATH" ]; then
   cp "$BOX_BLL_PATH/clash/config.yaml" "$BOX_BLL_PATH/clash/config.yaml.bak"
   cp "$BOX_BLL_PATH/scripts/box.config" "$BOX_BLL_PATH/scripts/box.config.bak"
   cp -f "$MODPATH/box_bll/clash/config.yaml" "$BOX_BLL_PATH/clash/"
-  cp -f "$MODPATH/box_bll/clash/Toolbox.sh" "$BOX_BLL_PATH/clash/"
   cp -f "$MODPATH/box_bll/scripts/"* "$BOX_BLL_PATH/scripts/"
 
   OLD_CONFIG="$BOX_BLL_PATH/scripts/box.config.bak"
