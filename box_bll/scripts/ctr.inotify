@@ -17,8 +17,16 @@ scripts=$(realpath "$0")
 scripts_dir=$(dirname "${scripts}")
 
 events=$1
-
 [ "$events" != "w" ] && return
+if [ "$events" = "w" ]; then
+    current_time=$(date +%s)
+    last_time=$(cat "$last_check_file" 2>/dev/null)
+    last_time=${last_time:-0}
+    if [ $((current_time - last_time)) -lt 2 ]; then
+        exit 0
+    fi
+    echo "$current_time" > "$last_check_file"
+fi
 
 . "${scripts_dir}/box.config"
 
@@ -39,6 +47,37 @@ get_current_bssid() {
     printf "%s\n" "$BSSID"
 }
 
+get_current_ssid() {
+    local SSID=$(cmd wifi status 2>/dev/null | awk '
+        /Wifi is connected to/ {
+            s = $0
+            sub(/^.*Wifi is connected to[ \t]*/, "", s)
+            sub(/^"/, "", s)
+            sub(/"$/, "", s)
+            gsub(/^[ \t]+|[ \t]+$/, "", s)
+            print s; exit
+        }
+    ')
+    if [ -z "$SSID" ]; then
+        SSID=$(dumpsys wifi 2>/dev/null | awk '
+            /mWifiInfo/ {
+                if (match($0, /SSID: /)) {
+                    s = substr($0, RSTART+6)
+                    sub(/,.*/, "", s)
+                    sub(/^"/, "", s)
+                    sub(/"$/, "", s)
+                    gsub(/^[ \t]+|[ \t]+$/, "", s)
+                    print s; exit
+                }
+            }
+        ')
+    fi
+    if [ -z "$SSID" ] || [ "$SSID" = "<none>" ] || [ "$SSID" = "null" ] || [ "$SSID" = "<unknown ssid>" ]; then
+        SSID="unknown"
+    fi
+    printf "%s\n" "$SSID"
+}
+
 get_current_ip() {
     ip -4 addr show wlan0 2>/dev/null | awk '/inet / {sub(/\/.*/, "", $2); print $2; exit}'
 }
@@ -47,6 +86,24 @@ is_allowed_mac() {
     local mac=$(echo "$1" | tr '[:upper:]' '[:lower:]')
     local allowed_macs=$(echo "$2" | tr '[:upper:]' '[:lower:]' | sed 's/，/,/g; s/　/ /g')
     printf "%s" "$allowed_macs" | awk -v target="$mac" -F',' '
+        BEGIN { rs = 1 }
+        {
+            for (i=1; i<=NF; i++) {
+                s = $i
+                sub(/^[ \t]+/, "", s)
+                sub(/[ \t]+$/, "", s)
+                if (s == "") continue
+                if (s == target) { rs = 0; exit }
+            }
+        }
+        END { exit rs }
+    '
+}
+
+is_allowed_ssid() {
+    local ssid=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+    local allowed_ssids=$(echo "$2" | tr '[:upper:]' '[:lower:]' | sed 's/，/,/g; s/　/ /g')
+    printf "%s" "$allowed_ssids" | awk -v target="$ssid" -F',' '
         BEGIN { rs = 1 }
         {
             for (i=1; i<=NF; i++) {
@@ -84,6 +141,15 @@ log_current_config() {
         [ "$use_wifi_list_mode" = "blacklist" ] && log_msg "        - blacklist_wifi_macs: [${blacklist_wifi_macs}]"
         [ "$use_wifi_list_mode" = "whitelist" ] && log_msg "        - whitelist_wifi_macs: [${whitelist_wifi_macs}]"
     fi
+    log_msg "        - enable_ssid_filter: [${enable_ssid_filter}]"
+    if [ "$enable_ssid_filter" = "true" ]; then
+        log_msg "        - use_wifi_list_mode: [${use_wifi_list_mode}]"
+        [ "$use_wifi_list_mode" = "blacklist" ] && log_msg "        - blacklist_wifi_ssids: [${blacklist_wifi_ssids}]"
+        [ "$use_wifi_list_mode" = "whitelist" ] && log_msg "        - whitelist_wifi_ssids: [${whitelist_wifi_ssids}]"
+    fi
+    if [ "$enable_ssid_filter" = "true" ] && [ "$enable_mac_filter" = "true" ]; then
+        log_msg "        - [WARN] Both SSID and MAC filters are enabled. SSID filter takes precedence."
+    fi
 }
 
 clean_old_logs() {
@@ -101,6 +167,7 @@ clean_old_logs() {
 clean_old_logs
 
 bssid=$(get_current_bssid)
+ssid=$(get_current_ssid)
 current_ip=$(get_current_ip)
 if [ "$bssid" != "unknown" ]; then
     wifi_status="wifi"
@@ -202,7 +269,7 @@ check_module_service() {
         else
             log_msg ""
             log_msg "[INFO] Network status changed!"
-            log_msg "[INFO] WiFi Connected - MAC: [${bssid}], IP: [${current_ip:-"Allocating..."}]"
+            log_msg "[INFO] WiFi Connected - SSID: [${ssid}], MAC: [${bssid}], IP: [${current_ip:-"Allocating..."}]"
             log_current_config
         fi
         printf "mac:%s\nip:%s\n" "$bssid" "$current_ip" > "$last_wifi_state_file"
@@ -213,9 +280,36 @@ check_module_service() {
             force_refresh="false"
         fi
 
+        if [ "$enable_ssid_filter" = "true" ] && [ "$enable_mac_filter" = "true" ]; then
+            log_msg "[WARN] Both SSID and MAC filters are enabled. SSID filter takes precedence; MAC filter has been disabled."
+            enable_mac_filter="false"
+        fi
+
         if [ "$enable_wifi_proxy" = "false" ]; then
             if [ "$current_state" != "bypassed" ] || [ "$force_refresh" = "true" ]; then
                 apply_wifi_bypass "enable"
+            fi
+        elif [ "$enable_ssid_filter" = "true" ]; then
+            if [ "$use_wifi_list_mode" = "blacklist" ]; then
+                if is_allowed_ssid "$ssid" "$blacklist_wifi_ssids"; then
+                    if [ "$current_state" != "bypassed" ] || [ "$force_refresh" = "true" ]; then
+                        apply_wifi_bypass "enable"
+                    fi
+                else
+                    if [ "$current_state" != "proxying" ] || [ "$force_refresh" = "true" ]; then
+                        apply_wifi_bypass "disable"
+                    fi
+                fi
+            elif [ "$use_wifi_list_mode" = "whitelist" ]; then
+                if is_allowed_ssid "$ssid" "$whitelist_wifi_ssids"; then
+                    if [ "$current_state" != "proxying" ] || [ "$force_refresh" = "true" ]; then
+                        apply_wifi_bypass "disable"
+                    fi
+                else
+                    if [ "$current_state" != "bypassed" ] || [ "$force_refresh" = "true" ]; then
+                        apply_wifi_bypass "enable"
+                    fi
+                fi
             fi
         elif [ "$enable_mac_filter" = "true" ]; then
             if [ "$use_wifi_list_mode" = "blacklist" ]; then
