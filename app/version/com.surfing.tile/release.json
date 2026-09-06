@@ -1,5 +1,28 @@
 [
     {
+        "versionName": "v6.0.0",
+        "changelog": [
+            "Build Date: 2026-09-07 06:37:15",
+            "",
+            "代理页支持 iOS 液态玻璃风格的主题",
+            "代理页、关于页 均支持，及各种动态媒体",
+            "",
+            "全新的软件包名、App 无需挂载固化子模块",
+            "",
+            "控制面板高度适配 Zephyruso/zashboard",
+            "",
+            "网络过滤支持 SSID/MAC 模式匹配",
+            "",
+            "Shell 更高效的调用",
+            "",
+            "该版本需要搭配模块 v7.8.4以上",
+            "不知不觉 Surfing 已经满3周年啦！"
+        ],
+        "fileSize": 10673892,
+        "sha256": "0a42f3ff1565b9e7ab8942b89babb848ab91a9200134e02bf4481de7e76f0b84",
+        "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.github.surfing/SurfingTile_{VER}_release.apk"
+    },
+    {
         "versionName": "v5.38.2",
         "changelog": [
             "Build Timestamp: 2026-08-15 03:30:28",
