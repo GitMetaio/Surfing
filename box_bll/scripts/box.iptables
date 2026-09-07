@@ -373,6 +373,12 @@ start_tproxy() {
     ${iptables} -t mangle -I BOX_EXTERNAL 2 -p tcp --dport 53 -j RETURN
   fi
 
+  if [ "${bypass_ike_natt:-true}" = "true" ]; then
+    ${iptables} -t mangle -I BOX_LOCAL 1 -p udp --dport 4500 -j RETURN
+    ${iptables} -t mangle -I BOX_LOCAL 1 -p udp --dport 500 -j RETURN
+    [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "原生放行: IKE/NAT-T (UDP 500/4500) 已生效."
+  fi
+
   ${iptables} -t mangle -A BOX_LOCAL -j CONNMARK --save-mark
   ${iptables} -t mangle -I OUTPUT -j BOX_LOCAL
 
