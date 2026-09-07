@@ -75,30 +75,28 @@ Please decide whether to use the Surfing module only after clearly understanding
 ## Group Telegram
 
 <a href="https://t.me/Surfingbox">
-  <img src="./folder/IMG_20260218_112257.jpg" alt="Group" width="100">
+  <img src="./folder/Group.png" alt="Group" width="100">
 </a>
 
 ## Wiki
 
 <details>
-<summary>1. FirstTime Use</summary>
+<summary>1. First Time Use</summary>
 
-- After the module is installed for the first time, **please first** add your subscription URL in  
-  `/data/adb/box_bll/clash/config.yaml`, or do it via the Web Desktop App  
-  (**Note: SurfingTile must be invoked and Root permission is required**), then manually reboot your device once.
-- After rebooting, toggle the module switch once, open the **Web App** on your desktop, and you can start using it.
-- Due to network issues, not all **rules**/**subscriptions** may download automatically; please manually refresh them in the panel.
-- If subscriptions fail to load, try switching the **Ua** in the configuration file.
-- If the above fails, ensure your network environment is normal.
+- After the module is installed for the first time, **please first** add your subscription URL to  
+  `/data/adb/box_bll/clash/config.yaml`, or add it through the desktop App  
+  (**Note: SurfingTile requires Root permission to operate**), then manually reboot your device once.
+- After rebooting, open the **SurfingTile App** from the desktop to start using it.
+- Due to network issues, **rules**/**subscriptions** may not be fully downloaded automatically; please manually refresh them from the panel.
+- If the subscription fails to load, try switching the **Ua** in the configuration.
+- If the issue persists, make sure your network environment is working properly.
 
-- Web App:
-    - Can be used via Menu → Config Override → Fill in subscription
+- SurfingTile App:
+    - Can be used to add subscriptions via Menu → Config Override → Fill in subscription
     - Used for portable browsing and managing backend routing data
 
-<img src="./folder/app.png" alt="App UI" width="300">
-
-> If the panel content is displayed abnormally or cannot be displayed,  
-> please update the `com.google.android.webview` component via Google Play Store.
+> If the panel content is displayed incorrectly or cannot be displayed,  
+please update the `com.google.android.webview` component through the Google Play Store.
 
 </details>
 
@@ -107,7 +105,7 @@ Please decide whether to use the Surfing module only after clearly understanding
 <details>
 <summary>2. Controlling Operation</summary>
 
-- You can control start/stop via **WiFi SSID**.
+- You can control start/stop via **WiFi SSID/MAC**.
 - You can control service using the module toggle switch  
   `Changes take effect in real time, no reboot required`
 - You can add the module's control tile to the system status bar  
@@ -179,7 +177,7 @@ Android user group IDs:
 - Disabled by default
 - When using blacklist/whitelist, exclude the corresponding package names
 
-> Can be enabled or disabled manually via configuration if needed.
+> Can be enabled or disabled manually via configuration if required.
 
 ### Routing Rules
 - Optimized for Mainland China
@@ -194,7 +192,7 @@ Android user group IDs:
 
 ### LAN Sharing
 - Enable hotspot to allow other devices to connect
-- Tun Gateway: `172.20.0.1`
+- Tun Gateway: `198.18.0.0`
 
 > To access the backend console from other devices:  
 > `http://<CurrentWiFi>/<TunGateway>:9090/ui`
@@ -219,7 +217,7 @@ Android user group IDs:
 > Supports Android 10+
 
 - Must run in **system space** and require **Root** permission
-- For **KSU** users, you need to install the **"Meta Module"** to obtain mount permissions
+- ~~For **KSU** users, you need to install the **"Meta Module"** to obtain mount permissions~~ `com.github.surfing v6.0.0 is now standalone`
 - The tile works entirely based on the **Clash API**, please check if the API settings are correct
   - **Path:** → Home Settings → More Settings → Port Settings
 
@@ -227,7 +225,7 @@ Android user group IDs:
 > Long press the home icon to toggle **Gold Privilege**
 
 - Preview
-  ![App Interface](folder/IMG_20260813_032529.jpg)
+  ![App Interface](folder/SurfingTilePreview.png)
 
 </details>
 

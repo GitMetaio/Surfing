@@ -77,7 +77,7 @@
 ## Group Telegram
 
 <a href="https://t.me/Surfingbox">
-  <img src="./folder/IMG_20260218_112257.jpg" alt="Group" width="100">
+  <img src="./folder/Group.png" alt="Group" width="100">
 </a>
 
 ## Wiki
@@ -85,17 +85,15 @@
 <details>
 <summary>1. 首次使用</summary>
 
-- 首次安装模块完成后，**请先**于 `/data/adb/box_bll/clash/config.yaml` 添加你的订阅地址，亦或者通过 Web 桌面 App(**注意: 需调用SurfingTile且持有Root才能操作**)，随后需手动重启设备一次
-- 设备重启后，切换模块开关一次，桌面打开 **Web App** 即可开始使用
+- 首次安装模块完成后，**请先**于 `/data/adb/box_bll/clash/config.yaml` 添加你的订阅地址，或者通过桌面 App(**注意: SurfingTile且持有Root才能操作**)，随后需手动重启设备一次
+- 设备重启后，桌面打开 **SurfingTile App** 即可开始使用
 - 可能因网络原因不会自动下载完全部 **规则**/**订阅**，请至面板手动刷新一下
-- 如遇订阅无法加载请尝试切换配置文件里面的 **Ua**
+- 如遇订阅无法加载请尝试切换配置里面的 **Ua**
 - 如上述失败，确保你的网络环境正常
 
-- Web App：
+- SurfingTile App：
     - 可用于通过菜单 → 配置覆写 → 填写订阅
     - 用于便携浏览及管理后台路由数据
-  
-<img src="./folder/app.png" alt="App UI" width="300">
 
 > 如遇面板显示内容异常 / 或内容无法显示  
 需通过 Google play 商店更新 com.google.android.webview 组件版本
@@ -107,7 +105,7 @@
 <details>
 <summary>2. 控制运行</summary>
 
-- 可通过 WiFi SSID 网络控制启停
+- 可通过 WiFi SSID/MAC 网络控制启停
 - 可通过模块开关进行 关闭/开启 控制运行  
   `操作实时生效无需重启`
 - 可向系统状态栏添加模块的控制开关磁贴  
@@ -170,7 +168,7 @@
 - 默认关闭
 - 使用黑白名单时需排除相应包名
 
-> 如特殊需要可自行通过配置关闭
+> 如特殊需要可自行通过配置开启
 
 ### 路由规则
 - 为大陆饶行
@@ -181,11 +179,11 @@
 ### 面板管理
 - Magisk字体模块
 
-> 会影响页面字体正常显示
+> 可能会影响页面字体正常显示
 
 ### 局域网共享
 - 开启热点让其它设备连接即可
-- Tun 网关: `172.20.0.1`
+- Tun 网关: `198.18.0.0`
 
 > 其它设备若访问控制台后端: `http://当前WiFi/Tun网关:9090/ui`
 
@@ -209,7 +207,8 @@
 > 支持 Android10+
 
 - 需要工作在**系统空间**，并且持有 **Root** 权限
-- 对于 **KSU** 用户，则需要安装 **"元模块"** 才能拥有挂载权限
+
+- ~~对于 **KSU** 用户，则需要安装 **"元模块"** 才能拥有挂载权限~~ `com.github.surfing v6.0.0 已独立`
 - 磁贴全程围绕 **Clash API** 工作，请检查 API 设置是否正确
   - **路径:** → 主页设置 → 更多设置 → 端口设置
 
@@ -217,7 +216,7 @@
 > 通过长按首页图标 开启/关闭 **金牌特权**
 
 - 预览
-  ![程序界面](folder/IMG_20260813_032529.jpg)
+  ![程序界面](folder/SurfingTilePreviewImage.png)
 
 </details>
 
