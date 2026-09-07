@@ -1,3 +1,12 @@
+# v7.8.4
+### 📦 Sync Latest Branch
+- Remove SurfingTile submodule
+- Network filtering supports SSID/MAC matching
+
+### 📱 SurfingTile v6.0.0
+- New package `com.github.surfing`
+- [View detailed changelog](https://raw.githubusercontent.com/GitMetaio/Surfing/refs/heads/main/app/version/com.github.surfing/release.json)
+
 # v7.8.3
 ### 🛠️ Iptables
 - Fix proxy list truncation caused by duplicate entries in `packages.list`
