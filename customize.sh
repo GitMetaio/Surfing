@@ -173,6 +173,7 @@ sync_version_from_module_prop
 
       [ "$INSTALL_TILE" = "true" ] && { remove_old_surfingtile; install_surfingtile_apk; }
       cp -f "$MODPATH/box_bll/bin/busybox" "$BIN_PATH/busybox" && init_busybox_toolchain
+      cp -f "$MODPATH/box_bll/bin/curl" "$BIN_PATH/curl"
       extract_subscribe_urls
 
       if pm path "com.github.surfing" >/dev/null 2>&1; then

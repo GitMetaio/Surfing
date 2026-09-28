@@ -8,6 +8,10 @@ MIHOMO_API="https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
 MIHOMO_BASE="https://github.com/MetaCubeX/mihomo/releases/download"
 MIHOMO_NAME="mihomo-android-arm64-v8"
 
+CURL_DST="box_bll/bin/curl"
+CURL_TMP="curl_tmp"
+CURL_URL="https://raw.githubusercontent.com/Zackptg5/Cross-Compiled-Binaries-Android/master/curl/curl-arm64"
+
 ZASH_API="https://api.github.com/repos/Zephyruso/zashboard/releases/latest"
 ZASH_DST="box_bll/clash/webroot/Zash"
 ZASH_TMP="zash_dist.zip"
@@ -37,6 +41,15 @@ if curl -fL --retry 5 --retry-delay 5 "$download_url" -o "$CORE_TMP"; then
     chmod +x "$CORE_DST"
 else
     echo "Error: Mihomo download failed."
+    exit 1
+fi
+
+echo "Downloading curl..."
+if curl -fL --retry 5 --retry-delay 5 "$CURL_URL" -o "$CURL_TMP"; then
+    mv -f "$CURL_TMP" "$CURL_DST"
+    chmod +x "$CURL_DST"
+else
+    echo "Error: curl download failed."
     exit 1
 fi
 
