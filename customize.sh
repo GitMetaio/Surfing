@@ -179,13 +179,14 @@ sync_version_from_module_prop
       if pm path "com.github.surfing" >/dev/null 2>&1; then
         CORE_HASH=$(grep '^version=' "$MODPATH/module.prop" | sed 's/.*(//; s/).*//; s/.*-//')
         [ -n "$CORE_HASH" ] && {
-          for prefs_dir in "/data/user/0/com.github.surfing" "/data/data/com.github.surfing"; do
-            prefs_file="${prefs_dir}/shared_prefs/OverviewsPrefs.xml"
-            if [ -f "$prefs_file" ]; then
-              sed "s|<string name=\"cached_core_version\">[^<]*</string>|<string name=\"cached_core_version\">${CORE_HASH}</string>|" "$prefs_file" > "${prefs_file}.tmp"
-              cat "${prefs_file}.tmp" > "$prefs_file"; rm -f "${prefs_file}.tmp"
-            fi
-          done
+          SYNC_DATA=$(settings get global surfing_sync_data 2>/dev/null)
+          case "$SYNC_DATA" in
+            ""|null) ;;
+            *)
+              NOW_TS=$(date +%s)
+              settings put global surfing_sync_data "$(echo "$SYNC_DATA" | sed "s|^ID=[0-9]*|ID=$NOW_TS|; s|version=[^|]*|version=$CORE_HASH|")"
+              ;;
+          esac
         }
       fi
 
