@@ -1,0 +1,87 @@
+#!/system/bin/sh
+# 免模块安装的服务开关：surfing start|stop|restart|status
+# 通过 switch/disable 文件控制，与模块版在管理器中开关模块的效果相同
+export PATH="/data/adb/box_bll/bin:$PATH"
+
+scripts=$(realpath "$0")
+scripts_dir=$(dirname "${scripts}")
+. "${scripts_dir}/box.config"
+
+switch_dir="${box_path}/switch"
+disable_file="${switch_dir}/disable"
+mkdir -p "${switch_dir}" "${run_path}"
+
+watching() {
+  for pid in $(pidof inotifyd); do
+    grep -q "box.inotify" "/proc/$pid/cmdline" 2>/dev/null && \
+      tr '\0' ' ' < "/proc/$pid/cmdline" | grep -q "${switch_dir}" && return 0
+  done
+  return 1
+}
+
+is_running() {
+  [ -f "${pid_file}" ] && kill -0 "$(cat "${pid_file}")" 2>/dev/null
+}
+
+direct_start() {
+  "${scripts_dir}/box.service" start >> "${run_path}/run.log" 2>> "${run_path}/run_error.log" && \
+    "${scripts_dir}/box.iptables" enable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
+}
+
+direct_stop() {
+  "${scripts_dir}/box.service" stop >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
+  "${scripts_dir}/box.iptables" disable >> "${run_path}/run.log" 2>> "${run_path}/run_error.log"
+}
+
+# 开关文件状态有变化时交给 box.inotify 处理，否则直接调用
+do_start() {
+  if [ -f "${disable_file}" ] && watching; then
+    rm -f "${disable_file}"
+  else
+    rm -f "${disable_file}"
+    is_running || direct_start
+  fi
+}
+
+do_stop() {
+  if [ ! -f "${disable_file}" ] && watching; then
+    touch "${disable_file}"
+  else
+    touch "${disable_file}"
+    direct_stop
+  fi
+}
+
+wait_state() {
+  n=0
+  while [ $n -lt 15 ]; do
+    if [ "$1" = up ]; then is_running && return 0; else is_running || return 0; fi
+    sleep 1; n=$((n + 1))
+  done
+  return 1
+}
+
+case "$1" in
+  start)
+    do_start
+    if wait_state up; then echo "已启动"; else echo "启动失败，查看 ${run_path}/run_error.log"; exit 1; fi
+    ;;
+  stop)
+    do_stop
+    if wait_state down; then echo "已停止"; else echo "停止超时"; exit 1; fi
+    ;;
+  restart)
+    do_stop; wait_state down; sleep 1
+    do_start
+    if wait_state up; then echo "已重启"; else echo "启动失败，查看 ${run_path}/run_error.log"; exit 1; fi
+    ;;
+  status)
+    if is_running; then echo "运行中 (pid $(cat "${pid_file}"))"; else echo "未运行"; fi
+    [ -f "${disable_file}" ] && echo "开机自启: 已关闭 (存在 ${disable_file})" || echo "开机自启: 开启"
+    watching && echo "开关监听: 正常" || echo "开关监听: 未运行"
+    ;;
+  *)
+    echo "用法: $0 start|stop|restart|status"
+    exit 1
+    ;;
+esac

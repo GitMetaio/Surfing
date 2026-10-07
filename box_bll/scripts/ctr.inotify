@@ -6,7 +6,7 @@ SYS_IPTABLES="/system/bin/iptables"
 SYS_IP6TABLES="/system/bin/ip6tables"
 
 variab_dir="/dev/tmp/"
-module_dir="/data/adb/modules/Surfing"
+module_dir="/data/adb/box_bll/switch"
 disable_file="${module_dir}/disable"
 base_dir="/data/adb/box_bll"
 log_file="${base_dir}/run/net_debug.log"

@@ -2,10 +2,9 @@
 
 export PATH="/data/adb/box_bll/bin:$PATH"
 
-BASE_MODULES_DIR="/data/adb/modules"
-[ -n "$(magisk -v | grep lite)" ] && BASE_MODULES_DIR="/data/adb/lite_modules"
-
-SURFING_DIR="${BASE_MODULES_DIR}/Surfing"
+# root 脚本安装：监听开关目录，而不是模块目录
+SURFING_DIR="/data/adb/box_bll/switch"
+mkdir -p "$SURFING_DIR"
 SCRIPTS_DIR="/data/adb/box_bll/scripts"
 
 (

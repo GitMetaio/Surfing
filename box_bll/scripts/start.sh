@@ -1,8 +1,8 @@
 #!/system/bin/sh
 export PATH="/data/adb/box_bll/bin:$PATH"
 
-module_dir="/data/adb/modules/Surfing"
-magisk -v | grep -q lite && module_dir="/data/adb/lite_modules/Surfing"
+# root 脚本安装：开关目录不再是模块目录，存在 disable 文件即停止服务
+module_dir="/data/adb/box_bll/switch"
 
 scripts=$(realpath "$0")
 scripts_dir=$(dirname "${scripts}")

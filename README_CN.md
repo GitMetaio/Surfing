@@ -68,6 +68,22 @@
 - 从 [Release](https://github.com/GitMetaio/Surfing/releases) 页下载模块压缩包，然后通过 Magisk Manager 或 KernelSU Manager 或 APatch 安装
 - 各版本变化 [📲日志.log](changelog.md)
 
+## 免模块安装（root 脚本方式）
+
+不经过 Magisk / KernelSU / APatch 管理器安装，模块列表中不会出现 Surfing。
+
+```sh
+# 使用 release zip（官方原版或本仓库构建均可）
+su -c sh root_install.sh /sdcard/Download/Surfing_vX.X.X_release.zip
+```
+
+- 选项：`--hosts` 挂载 hosts 文件（默认不挂载）、`--app` 安装 SurfingTile、`--no-start` 安装后不启动
+- 开机自启：`/data/adb/service.d/Surfing_service.sh`
+- 启停：`su -c /data/adb/box_bll/scripts/surfing start|stop|restart|status`
+- 开关文件：`/data/adb/box_bll/switch/disable`（替代模块目录下的 disable）
+- 卸载：`su -c sh /data/adb/box_bll/scripts/root_uninstall.sh`
+- SurfingTile App 中的启停开关依赖模块目录，免模块方式下请使用 `surfing` 命令
+
 ## 卸载
 
  - 从 Magisk Manager 、Kernelsu Manager 、APatch 应用卸载本模块即可 [👉🏻铲屎流程](https://github.com/GitMetaio/Surfing/blob/main/uninstall.sh#L3-L4)
