@@ -195,6 +195,7 @@ sync_version_from_module_prop
 
       cp "$BOX_BLL_PATH/clash/config.yaml" "$BOX_BLL_PATH/clash/config.yaml.bak"
       cp -f "$MODPATH/box_bll/clash/config.yaml" "$BOX_BLL_PATH/clash/"
+      cp -f "$MODPATH/box_bll/clash/config.yaml" "$MODPATH/default_config.yaml"
       
       cp "$BOX_BLL_PATH/scripts/box.config" "$BOX_BLL_PATH/scripts/box.config.bak"
       cp -f "$MODPATH/box_bll/scripts/"* "$BOX_BLL_PATH/scripts/"
@@ -230,6 +231,7 @@ sync_version_from_module_prop
       print_lang "正在安装..." "Installing..."
       ui_print "↴"
       mv "$MODPATH/box_bll" /data/adb/; init_busybox_toolchain; install_surfingtile_apk
+      cp -f "$BOX_BLL_PATH/clash/config.yaml" "$MODPATH/default_config.yaml"
       print_lang "模块安装完毕." "Module installation completed."
       
       choose_to_umount_hosts_file
