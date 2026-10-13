@@ -2,7 +2,6 @@
 export PATH="/data/adb/box_bll/bin:$PATH"
 
 module_dir="/data/adb/modules/Surfing"
-magisk -v | grep -q lite && module_dir="/data/adb/lite_modules/Surfing"
 
 scripts=$(realpath "$0")
 scripts_dir=$(dirname "${scripts}")

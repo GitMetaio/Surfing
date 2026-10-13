@@ -6,7 +6,7 @@ MIN_KSU_VER=10670; KSU_DIR_VER=10683
 LANG_EN=false
 
 CURRENT_MODULES_DIR="/data/adb/modules"
-magisk -v | grep -q lite && CURRENT_MODULES_DIR="/data/adb/lite_modules"
+magisk -v | grep -q lite && abort "Error: Magisk Lite is no longer supported. Please use standard Magisk / KernelSU / APatch"
 
 SURFING_PATH="$CURRENT_MODULES_DIR/Surfing"
 BOX_BLL_PATH="/data/adb/box_bll"

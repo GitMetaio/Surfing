@@ -6,8 +6,6 @@ rm -rf /data/adb/box_bll 2>/dev/null
 
 rm -rf /data/adb/modules/Surfingtile 2>/dev/null
 rm -rf /data/adb/modules/Surfing_Tile 2>/dev/null
-rm -rf /data/adb/lite_modules/Surfingtile 2>/dev/null
-rm -rf /data/adb/lite_modules/Surfing_Tile 2>/dev/null
 
 [ ! -d "/data/adb/service.d/" ] && mkdir -p "/data/adb/service.d"
 
