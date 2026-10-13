@@ -1,6 +1,24 @@
 [
     {
+        "versionName": "v7.0.0",
+        "versionCode": 26101301,
+        "changelog": [
+            "Build Date: 2026-10-13 21:31:27",
+            "",
+            "支持 自定义配置编辑",
+            "支持 连接数可视化面板查看",
+            "",
+            "修复已知问题，提升稳定性",
+            "",
+            "生活好累... 日志懒得写了"
+        ],
+        "fileSize": 13980506,
+        "sha256": "721546b0222c3d60b898fa7a951d6c789250dcb2c04d41273fb62b0b9b06d064",
+        "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.github.surfing/SurfingTile_{VER}_release.apk"
+    },
+    {
         "versionName": "v6.0.0",
+        "versionCode": 26090701,
         "changelog": [
             "Build Date: 2026-09-07 06:37:15",
             "",
