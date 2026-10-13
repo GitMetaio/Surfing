@@ -1,5 +1,8 @@
 #!/system/bin/sh
 
+[ -f /dev/.surf_svc_boot ] && exit 0
+: > /dev/.surf_svc_boot
+
 export PATH="/data/adb/box_bll/bin:$PATH"
 
 BASE_MODULES_DIR="/data/adb/modules"
@@ -11,7 +14,7 @@ SCRIPTS_DIR="/data/adb/box_bll/scripts"
 until [ "$(getprop sys.boot_completed)" = "1" ]; do
   sleep 3
 done
-"${SCRIPTS_DIR}/start.sh"
+SURFING_BOOT=1 "${SCRIPTS_DIR}/start.sh"
 ) &
 
 HOSTS_PATH="/data/adb/box_bll/clash/etc"

@@ -1,6 +1,8 @@
 #!/system/bin/sh
 export PATH="/data/adb/box_bll/bin:$PATH"
 
+[ "$SURFING_BOOT" = "1" ] || exit 0
+
 module_dir="/data/adb/modules/Surfing"
 
 scripts=$(realpath "$0")
