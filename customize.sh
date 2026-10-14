@@ -209,6 +209,9 @@ sync_version_from_module_prop
           val=$(grep "^${var}=" "$OLD_CONFIG" | cut -d'=' -f2-)
           [ -n "$val" ] && sed "s@^${var}=.*@${var}=${val}@" "$TMP_CONFIG" > "${TMP_CONFIG}.bak" && mv -f "${TMP_CONFIG}.bak" "$TMP_CONFIG"
         done
+        for iface in "swlan+" "softap+"; do
+          grep "^ap_list=" "$TMP_CONFIG" | grep -qF "$iface" || sed -i "s@^ap_list=(\(.*\))@ap_list=(\1 \"${iface}\")@" "$TMP_CONFIG"
+        done
         mv -f "$TMP_CONFIG" "$NEW_CONFIG"
         print_lang "设置迁移成功." "Settings migrated successfully."
       }
