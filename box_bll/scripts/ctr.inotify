@@ -12,6 +12,7 @@ base_dir="/data/adb/box_bll"
 log_file="${base_dir}/run/net_debug.log"
 last_check_file="${variab_dir}/last_check_time"
 last_wifi_state_file="${variab_dir}/last_wifi_state"
+target_chains="BOX_LOCAL BOX_EXTERNAL CLASH_DNS_LOCAL CLASH_DNS_EXTERNAL"
 
 scripts=$(realpath "$0")
 scripts_dir=$(dirname "${scripts}")
@@ -183,9 +184,38 @@ fi
 
 date +%s > "$last_check_file"
 
+bypass_rules_present() {
+    local cmd table chain found=0
+    for cmd in "${SYS_IPTABLES} -w 100" "${SYS_IP6TABLES} -w 100"; do
+        for chain in $target_chains; do
+            for table in mangle nat; do
+                $cmd -t $table -L "$chain" -n >/dev/null 2>&1 || continue
+                found=1
+                $cmd -t $table -C "$chain" -j NET_BYPASS >/dev/null 2>&1 || return 1
+            done
+        done
+    done
+    [ "$found" = "1" ]
+}
+
+bypass_stop_service() {
+    "${scripts_dir}/box.service" stop >> "$log_file" 2>&1
+    "${scripts_dir}/box.iptables" disable >> "$log_file" 2>&1
+    touch "${variab_dir}/wifi_bypassed"
+}
+
+bypass_resume_service() {
+    rm -f "${variab_dir}/wifi_bypassed"
+    if [ -f "$disable_file" ] || [ -f "${box_path}/manual" ]; then
+        log_msg "[INFO] Module disabled by user (or manual mode); skip auto start."
+        return 0
+    fi
+    "${scripts_dir}/box.service" start >> "$log_file" 2>&1
+    "${scripts_dir}/box.iptables" enable >> "$log_file" 2>&1
+}
+
 apply_wifi_bypass() {
     local state="$1"
-    local target_chains="BOX_LOCAL BOX_EXTERNAL CLASH_DNS_LOCAL CLASH_DNS_EXTERNAL"
 
     clean_legacy_rules() {
         log_msg "[DEBUG] Cleaning up bypass rules..."
@@ -206,19 +236,20 @@ apply_wifi_bypass() {
     if [ "$bypass_via_iptables" != "true" ]; then
         if [ "$state" = "enable" ]; then
             log_msg "[DEBUG] Bypass activated: Stopping proxy service..."
-            touch "$disable_file"
-            touch "${variab_dir}/wifi_bypassed"
+            bypass_stop_service
         else
             log_msg "[DEBUG] Bypass deactivated: Resuming proxy service..."
-            rm -f "$disable_file"
-            rm -f "${variab_dir}/wifi_bypassed"
             clean_legacy_rules
+            bypass_resume_service
         fi
         return 0
     fi
 
     if [ "$state" = "enable" ]; then
-        [ -f "${variab_dir}/wifi_bypassed" ] && return 0
+        if [ -f "${variab_dir}/wifi_bypassed" ] && bypass_rules_present; then
+            return 0
+        fi
+        [ -f "${variab_dir}/wifi_bypassed" ] && log_msg "[WARN] Bypass marker present but rules missing; re-injecting."
         log_msg "[DEBUG] Bypass activated: Injecting Iptables rules..."
         for cmd in "${SYS_IPTABLES} -w 100" "${SYS_IP6TABLES} -w 100"; do
             for table in mangle nat filter; do
@@ -236,12 +267,10 @@ apply_wifi_bypass() {
                 done
             done
         done
-        rm -f "$disable_file" 
         touch "${variab_dir}/wifi_bypassed"
         log_msg "[INFO] Iptables bypass rules injected SUCCESS."
     elif [ "$state" = "disable" ]; then
         clean_legacy_rules
-        rm -f "$disable_file"
         rm -f "${variab_dir}/wifi_bypassed"
         log_msg "[INFO] Iptables bypass rules cleaned SUCCESS."
     fi
@@ -249,7 +278,13 @@ apply_wifi_bypass() {
 }
 
 check_module_service() {
-    if [ -f "${variab_dir}/wifi_bypassed" ] || { [ "$bypass_via_iptables" != "true" ] && [ -f "$disable_file" ]; }; then
+    if [ "$bypass_via_iptables" = "true" ]; then
+        if [ -f "${variab_dir}/wifi_bypassed" ] && bypass_rules_present; then
+            current_state="bypassed"
+        else
+            current_state="proxying"
+        fi
+    elif [ -f "${variab_dir}/wifi_bypassed" ] || [ -f "$disable_file" ]; then
         current_state="bypassed"
     else
         current_state="proxying"
@@ -342,6 +377,11 @@ check_module_service() {
         log_msg "[INFO] Physical Network: WiFi disconnected or Cellular active."
         log_current_config
         echo "mac:DISCONNECTED" > "$last_wifi_state_file"
+        if [ "$events" = "w" ]; then
+            force_refresh="true"
+        else
+            force_refresh="false"
+        fi
         if [ "$enable_cellular_proxy" = "true" ]; then
             if [ "$current_state" = "bypassed" ] || [ "$force_refresh" = "true" ]; then
                 log_msg "[INFO] Strategy: Resuming proxy service for Cellular network."
