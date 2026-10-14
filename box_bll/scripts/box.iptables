@@ -362,7 +362,7 @@ start_tproxy() {
     ${iptables} -t mangle -I BOX_LOCAL 1 -m owner --uid-owner "${box_user}" --gid-owner "${box_group}" -j RETURN
   fi
 
-  ${iptables} -t mangle -I BOX_LOCAL 2 -j CONNMARK --restore-mark
+  ${iptables} -t mangle -I BOX_LOCAL 2 -j CONNMARK --restore-mark --nfmask "${mark_id%%/*}" --ctmask "${mark_id%%/*}"
   ${iptables} -t mangle -I BOX_LOCAL 3 -m mark --mark "${mark_id}" -j ACCEPT
 
   if [ "$use_nat_table" = "true" ]; then
@@ -380,7 +380,7 @@ start_tproxy() {
     [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "原生放行: IKE/NAT-T (UDP ${bypass_ike_natt_ports[*]}) 已生效."
   fi
 
-  ${iptables} -t mangle -A BOX_LOCAL -j CONNMARK --save-mark
+  ${iptables} -t mangle -A BOX_LOCAL -j CONNMARK --save-mark --nfmask "${mark_id%%/*}" --ctmask "${mark_id%%/*}"
   ${iptables} -t mangle -I OUTPUT -j BOX_LOCAL
 
   local localhost="127.0.0.1"
