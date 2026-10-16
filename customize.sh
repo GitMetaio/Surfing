@@ -174,20 +174,18 @@ choose_to_umount_hosts_file() {
 }
 
 choose_to_restore_config() {
-  if pm path "com.github.surfing" >/dev/null 2>&1; then
+  if [ -f "$BOX_BLL_PATH/clash/config.yaml.bak" ]; then
     ui_print " "
-    print_lang "检测到已安装 SurfingTile APP..." "SurfingTile APP detected..."
-    print_lang "是否需要通过 APP 恢复 Clash 配置文件？" "Do you need to restore Clash config via APP?"
-    print_lang "音量上键: 是 (恢复)" "Volume Up: Yes (Restore)"
-    print_lang "音量下键: 否 (跳过)" "Volume Down: No (Skip)"
+    print_lang "检测到已有 Clash 配置，是否保留？" "Existing Clash config found. Keep it?"
+    print_lang "音量上键: 保留我的配置" "Volume Up: Keep my config"
+    print_lang "音量下键: 使用新默认配置" "Volume Down: Use new default config"
     print_lang "请等待输入 (10s)..." "Waiting for input (10s)..."
-    
+
     if choose_volume_key; then
-      print_lang "正在拉起 APP 恢复配置..." "Waking up APP to restore config..."
-      am broadcast -a com.github.surfing.ACTION_SAVE_CONFIG -n com.github.surfing/com.github.surfing.service.BootReceiver >/dev/null 2>&1
-      print_lang "恢复指令已发送！" "Restore command sent!"
+      cp -f "$BOX_BLL_PATH/clash/config.yaml.bak" "$BOX_BLL_PATH/clash/config.yaml"
+      print_lang "已保留更新前的配置." "Kept the previous config."
     else
-      print_lang "已跳过配置文件恢复." "Skipped configuration restore."
+      print_lang "已使用新默认配置." "Using the new default config."
     fi
   fi
 }
