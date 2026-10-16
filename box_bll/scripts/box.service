@@ -6,7 +6,7 @@ SYS_IPTABLES="/system/bin/iptables"
 SYS_IP6TABLES="/system/bin/ip6tables"
 
 scripts=$(realpath "$0")
-scripts_dir=$(dirname "$scripts")
+scripts_dir=$(dirname "${scripts}")
 
 . "${scripts_dir}/box.config"
 
@@ -36,18 +36,18 @@ log() {
 }
 
 get_bin_pid() {
-    pidof -s "$bin_name"
+    pidof -s "${bin_name}"
 }
 
 get_bin_etime() {
-    ps -eo etime,comm | awk -v bin="$bin_name" '$2==bin {print $1; exit}'
+    /system/bin/ps -eo etime,comm | awk -v bin="${bin_name}" '$2 == bin { print $1; exit }'
 }
 
 check_permission() {
     bin_path=$(command -v "${bin_name}" 2>/dev/null)
     [ -z "${bin_path}" ] && bin_path="${box_path}/bin/${bin_name}"
 
-    eval $(echo "${box_user_group}" | awk -F ':' '{print "box_user=" $1 ";box_group=" $2}')
+    eval $(echo "${box_user_group}" | awk -F ':' '{ print "box_user=" $1 ";box_group=" $2 }')
 
     {
         chown "${box_user_group}" "${bin_path}"
@@ -59,64 +59,35 @@ check_permission() {
 
 start_bin() {
     ulimit -SHn 1000000
-    local log_out="/dev/null"
-    local check_args=""
-    local run_args=""
 
-    case "${bin_name}" in
-        sing-box)
-            check_args="check -D ${box_path}/${bin_name}"
-            run_args="run -D ${box_path}/${bin_name}"
-            ;;
-        clash|mihomo)
-            check_args="-t -d ${box_path}/${bin_name}"
-            run_args="-d ${box_path}/${bin_name}"
-            log_out="${box_path}/${bin_name}/log/${bin_name}_$(date +%Y%m%d%H%M).log"
-            ;;
-        xray)
-            export XRAY_LOCATION_ASSET="${box_path}/${bin_name}"
-            check_args="-test -confdir ${box_path}/${bin_name}"
-            run_args="-confdir ${box_path}/${bin_name}"
-            ;;
-        v2ray)
-            export V2RAY_LOCATION_ASSET="${box_path}/${bin_name}"
-            check_args="test -d ${box_path}/${bin_name}"
-            run_args="run -d ${box_path}/${bin_name}"
-            ;;
-        hysteria)
-            log Info "正在初始化 ${bin_name} 核心执行环境."
-            log_out="${box_path}/${bin_name}/${bin_name}_$(date +%Y%m%d%H%M).log"
-            setuidgid "${box_user_group}" "${bin_path}" -c "${box_path}/${bin_name}/config.yaml" > "${log_out}" 2> "${run_path}/error_${bin_name}.log" &
-
-            printf "%s" "$!" > "${pid_file}"
-            return 0
-            ;;
-        *)
-            log Error "配置冲突: 未识别的执行核心 ${bin_name}."
-            return 2
-            ;;
-    esac
-    if [ "${bin_name}" != "hysteria" ]; then
-        if ${bin_path} ${check_args} > "${run_path}/check.log" 2>&1; then
-            log Info "配置校验通过: 正在启动 ${bin_name} 核心进程."
-            setuidgid "${box_user_group}" "${bin_path}" ${run_args} > "${log_out}" 2> "${run_path}/error_${bin_name}.log" &
-
-            printf "%s" "$!" > "${pid_file}"
-            return 0
-        else
-            log Error "配置校验失败: 请检查 ${run_path}/check.log 中的语法错误."
-            return 1
-        fi
+    if [ "${bin_name}" != "clash" ] && [ "${bin_name}" != "mihomo" ]; then
+        log Error "配置冲突: 仅支持 clash/mihomo 核心, 当前核心为 ${bin_name}."
+        return 2
     fi
+
+    local check_args="-t -d ${box_path}/${bin_name}"
+    local run_args="-d ${box_path}/${bin_name}"
+    local log_out="${box_path}/${bin_name}/log/${bin_name}_$(date +%Y%m%d%H%M).log"
+
+    if ${bin_path} ${check_args} > "${run_path}/check.log" 2>&1; then
+        log Info "配置校验通过: 正在启动 ${bin_name} 核心进程."
+        setuidgid "${box_user_group}" "${bin_path}" ${run_args} > "${log_out}" 2> "${run_path}/error_${bin_name}.log" &
+        printf "%s" "$!" > "${pid_file}"
+        return 0
+    fi
+
+    log Error "配置校验失败: 请检查 ${run_path}/check.log 中的语法错误."
+    return 1
 }
 
 wait_bin_listen() {
     local wait_count=0
     local max_wait=3
+
     while [ "${wait_count}" -lt "${max_wait}" ]; do
         bin_pid=$(get_bin_pid)
         if [ -n "${bin_pid}" ]; then
-            if ls -l "/proc/${bin_pid}/fd" 2>/dev/null | awk '/socket:/{f=1; exit} END{exit !f}'; then
+            if ls -l "/proc/${bin_pid}/fd" 2>/dev/null | awk '/socket:/{ f=1; exit } END{ exit !f }'; then
                 log Info "${bin_name} 核心网络套接字已成功绑定并就绪."
                 return 0
             fi
@@ -124,59 +95,66 @@ wait_bin_listen() {
         sleep 1
         wait_count=$((wait_count + 1))
     done
+
     log Error "${bin_name} 核心响应超时，请检查 ${run_path}/error_${bin_name}.log."
     return 1
 }
 
 display_run_time() {
-    ps -eo etime,comm | awk -v bin="${bin_name}" '
-    $2==bin {
-        t=$1; 
-        if (t ~ /-/) {
-            split(t, d, "-"); split(d[2], tm, ":");
-            print d[1]"天"tm[1]"时"tm[2]"分"; exit
-        }
-        n=split(t, tm, ":");
-        if (n==3) { print tm[1]"时"tm[2]"分"; exit }
-        if (n==2) { print tm[1]"分钟"; exit }
-    }'
+    /system/bin/ps -eo etime,comm | awk -v bin="${bin_name}" '
+        $2 == bin {
+            t = $1
+            if (t ~ /-/) {
+                split(t, d, "-")
+                split(d[2], tm, ":")
+                print d[1] "天" tm[1] "时" tm[2] "分"
+                exit
+            }
+            n = split(t, tm, ":")
+            if (n == 3) { print tm[1] "时" tm[2] "分"; exit }
+            if (n == 2) { print tm[1] "分钟"; exit }
+        }'
 }
 
 display_bin_status() {
     bin_pid=$(get_bin_pid)
-    if [ -n "${bin_pid}" ]; then
-        log Info "${bin_name} 当前上下文 (UID:GID): $(stat -c %U:%G /proc/"${bin_pid}")."
-        log Info "${bin_name} 当前活跃进程 (PID: ${bin_pid})."
-
-        mem_mb=$(awk '/VmRSS/ {printf "%.2f MB", $2/1024; exit}' /proc/"${bin_pid}"/status)
-        log Info "${bin_name} 物理内存占用: ${mem_mb}"
-
-        cpu_usage=$(/system/bin/ps -eo %CPU,NAME 2>/dev/null | awk -v bin="$bin_name" '$2==bin {print $1"%"; exit}')
-        if [ -z "$cpu_usage" ] || [ "$cpu_usage" = "0%" ]; then
-            cpu_usage=$(dumpsys cpuinfo | awk -v bin="$bin_name" '$0 ~ bin {print $1; exit}')
-        fi
-        log Info "${bin_name} CPU 资源占用: ${cpu_usage}"
-        log Info "${bin_name} 进程持续运行时间: $(display_run_time)"
-        printf "%s" "${bin_pid}" > "${pid_file}"
-        return 0
-    else
+    if [ -z "${bin_pid}" ]; then
         log Warn "进程确认: ${bin_name} 服务当前已处于停止状态."
         return 1
     fi
+
+    log Info "${bin_name} 当前上下文 (UID:GID): $(stat -c %U:%G /proc/${bin_pid})."
+    log Info "${bin_name} 当前活跃进程 (PID: ${bin_pid})."
+
+    mem_mb=$(awk '/VmRSS/ { printf "%.2f MB", $2/1024; exit }' /proc/${bin_pid}/status)
+    log Info "${bin_name} 物理内存占用: ${mem_mb}"
+
+    cpu_usage=$(/system/bin/ps -eo %CPU,NAME 2>/dev/null | awk -v bin="${bin_name}" '$2 == bin { print $1 "%"; exit }')
+    if [ -z "${cpu_usage}" ] || [ "${cpu_usage}" = "0%" ]; then
+        cpu_usage=$(dumpsys cpuinfo | awk -v bin="${bin_name}" '$0 ~ bin { print $1; exit }')
+    fi
+    log Info "${bin_name} CPU 资源占用: ${cpu_usage}"
+    log Info "${bin_name} 进程持续运行时间: $(display_run_time)"
+
+    printf "%s" "${bin_pid}" > "${pid_file}"
+    return 0
 }
 
 clear_port_blockers() {
-    check_ports="${redir_port} ${tproxy_port} ${clash_dns_port} 7890"
-    ss_cache=$(/system/bin/ss -tulnp 2>/dev/null)
+    local check_ports="${redir_port} ${tproxy_port} ${clash_dns_port} 7890"
+    local ss_cache=$(/system/bin/ss -tulnp 2>/dev/null)
+    local port
+    local occupier_pid
+    local occupier_name
 
-    for port in $check_ports; do
-        [ -z "$port" ] && continue
-        local occupier_pid=$(echo "$ss_cache" | awk -v p=":${port} " '$0 ~ p && /pid=/ { match($0, /pid=[0-9]+/); print substr($0, RSTART+4, RLENGTH-4); exit }')
+    for port in ${check_ports}; do
+        [ -z "${port}" ] && continue
+        occupier_pid=$(echo "${ss_cache}" | awk -v p=":${port} " '$0 ~ p && /pid=/ { match($0, /pid=[0-9]+/); print substr($0, RSTART+4, RLENGTH-4); exit }')
 
-        if [ -n "$occupier_pid" ]; then
-            local occupier_name=$(cat /proc/$occupier_pid/comm 2>/dev/null || echo "未知进程")
+        if [ -n "${occupier_pid}" ]; then
+            occupier_name=$(cat /proc/${occupier_pid}/comm 2>/dev/null || echo "未知进程")
             log Warn "端口 ${port} 被 [${occupier_name}] (PID: ${occupier_pid}) 占用，已强制 kill."
-            kill -9 "$occupier_pid" 2>/dev/null
+            kill -9 "${occupier_pid}" 2>/dev/null
             sleep 0.5
         fi
     done
@@ -190,15 +168,15 @@ start_service() {
         if start_bin; then
             log Info "${bin_name} 核心已准备就绪 (PID: $(cat "${pid_file}"))."
             return 0
-        else
-            log Error "核心进程异常，启动流程已终止."
-            rm -f "${pid_file}" >/dev/null 2>&1
-            return 1
         fi
-    else
-        log Error "二进制核心缺失: 请将 ${bin_name} 放置于 ${box_path}/bin/ 目录."
-        return 2
+
+        log Error "核心进程异常，启动流程已终止."
+        rm -f "${pid_file}" >/dev/null 2>&1
+        return 1
     fi
+
+    log Error "二进制核心缺失: 请将 ${bin_name} 放置于 ${box_path}/bin/ 目录."
+    return 2
 }
 
 stop_service() {
@@ -221,19 +199,17 @@ case "$1" in
 
         pids=$(pgrep -f "$0 start" | sort -n)
         my_pid=$$
-        leader_pid=$(echo "$pids" | head -n 1)
-        if [ "$my_pid" -ne "$leader_pid" ]; then
-            log Warn "环境检查: 已有规则实例在运行，本次已自动挂起 (PID: $leader_pid)."
+        leader_pid=$(echo "${pids}" | head -n 1)
+        if [ "${my_pid}" -ne "${leader_pid}" ]; then
+            log Warn "环境检查: 已有规则实例在运行，本次已自动挂起 (PID: ${leader_pid})."
             exit 0
         fi
 
-        log Info "开始执行核心服务启动序列 (主控 PID: $my_pid)."
+        log Info "开始执行核心服务启动序列 (主控 PID: ${my_pid})."
         if start_service; then
             uptime_sec=$(cut -d. -f1 /proc/uptime)
             [ "${uptime_sec%.*}" -lt 180 ] && log Info "检测到系统冷启动，正在同步运行环境." && sleep 5
-            if wait_bin_listen; then
-                :
-            fi
+            wait_bin_listen || true
         fi
         ;;
     stop)
