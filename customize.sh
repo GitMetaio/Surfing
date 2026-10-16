@@ -22,12 +22,6 @@ HOSTS_FILE="$BOX_BLL_PATH/clash/etc/hosts"
 HOSTS_PATH="$BOX_BLL_PATH/clash/etc"
 HOSTS_BACKUP="$BOX_BLL_PATH/clash/etc/hosts.bak"
 SURFING_TILE_ZIP="$MODPATH/SurfingTile.zip"
-MODULE_PROP_PATH="$CURRENT_MODULES_DIR/Surfing/module.prop"
-MODULE_VERSION_CODE=0
-
-[ -f "$MODULE_PROP_PATH" ] && MODULE_VERSION_CODE=$(awk -F'=' '/versionCode/ {print $2}' "$MODULE_PROP_PATH")
-
-[ "$MODULE_VERSION_CODE" -lt 1653 ] && INSTALL_TILE=true || INSTALL_TILE=false
 
 [ "$BOOTMODE" != true ] && abort "Error: Please install via Magisk Manager / KernelSU Manager / APatch"; [ "$KSU" = true ] && [ "$KSU_VER_CODE" -lt "$MIN_KSU_VER" ] && abort "Error: Please update your KernelSU Manager version"; [ "$KSU" = true ] && [ "$KSU_VER_CODE" -lt "$KSU_DIR_VER" ] && service_dir="/data/adb/ksu/service.d" || service_dir="/data/adb/service.d"
 
@@ -112,11 +106,51 @@ install_surfingtile_apk() {
   unzip -o "$SURFING_TILE_ZIP" "com.github.surfing.apk" -d "$INSTALL_DIR" >/dev/null 2>&1
   if [ -f "$APK_TMP" ]; then
     print_lang "正在安装 SurfingTile APK..." "Installing Surfingtile APK..."
-    pm install "$APK_TMP"
+    pm install -r "$APK_TMP"
     rm -f "$APK_TMP"
   else
     print_lang "未找到 SurfingTile APK 文件." "Surfingtile APK not found."
   fi
+}
+
+tile_installed_version() {
+  v=$(dumpsys package com.github.surfing 2>/dev/null | tr ' ' '\n' | awk -F= '/^versionCode=/{print $2; exit}')
+  if [ -z "$v" ]; then
+    v=$(cmd package list packages --show-versioncode com.github.surfing 2>/dev/null | awk -F'versionCode:' '/versionCode:/{print $2; exit}' | tr -d ' ')
+  fi
+  if [ -z "$v" ]; then
+    v=$(pm dump com.github.surfing 2>/dev/null | tr ' ' '\n' | awk -F= '/^versionCode=/{print $2; exit}')
+  fi
+  [ -n "$v" ] && echo "$v" || echo 0
+}
+
+tile_zip_version() {
+  v=$(unzip -p "$SURFING_TILE_ZIP" version 2>/dev/null | awk -F= '/^versionCode=/{print $2; exit}' | tr -d ' ')
+  [ -n "$v" ] && echo "$v" || echo 0
+}
+
+install_surfingtile_if_needed() {
+  installed=$(tile_installed_version)
+  zip_version=$(tile_zip_version)
+
+  if [ "$installed" = "0" ]; then
+    print_lang "未检测到 SurfingTile APP，是否安装？" "SurfingTile APP not found. Install it?"
+    print_lang "音量上键: 安装" "Volume Up: Install"
+    print_lang "音量下键: 跳过" "Volume Down: Skip"
+    print_lang "请等待输入 (10s)..." "Waiting for input (10s)..."
+    if choose_volume_key; then
+      remove_old_surfingtile
+      install_surfingtile_apk
+    else
+      print_lang "已跳过 SurfingTile APP 安装." "Skipped SurfingTile APP installation."
+    fi
+    return
+  fi
+
+  [ "$zip_version" -le "$installed" ] && return
+
+  print_lang "正在更新 SurfingTile APP: $installed → $zip_version" "Updating SurfingTile APP: $installed -> $zip_version"
+  install_surfingtile_apk
 }
 
 sync_version_from_module_prop() {
@@ -171,7 +205,7 @@ sync_version_from_module_prop
       print_lang "正在更新模块..." "Updating module..."
       ui_print "↴"
 
-      [ "$INSTALL_TILE" = "true" ] && { remove_old_surfingtile; install_surfingtile_apk; }
+      install_surfingtile_if_needed
       cp -f "$MODPATH/box_bll/bin/busybox" "$BIN_PATH/busybox" && init_busybox_toolchain
       cp -f "$MODPATH/box_bll/bin/curl" "$BIN_PATH/curl"
       extract_subscribe_urls
