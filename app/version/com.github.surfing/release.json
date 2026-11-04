@@ -1,5 +1,25 @@
 [
     {
+        "versionName": "v7.1.0",
+        "versionCode": 26110501,
+        "changelog": [
+            "Build Date: 2026-11-05 06:27:00",
+            "",
+            "支持 网络活动页按关键字过滤连接",
+            "支持 代理页分组快速选择，标签边缘渐隐",
+            "支持 配置覆写 TUN 堆栈选择 MIPS",
+            "",
+            "修复 控制面板部分设备顶部重复留白",
+            "修复 网络活动页已关闭状态误判",
+            "修复 背景视频抢占音频焦点",
+            "",
+            "移除 模块更新时多余的配置恢复广播"
+        ],
+        "fileSize": 13968375,
+        "sha256": "d1b5bd7502639175e0fd7743dce0602be552f8e6dd0594d1969e9b54413842b1",
+        "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.github.surfing/SurfingTile_{VER}_release.apk"
+    },
+    {
         "versionName": "v7.0.0",
         "versionCode": 26101301,
         "changelog": [
@@ -7,6 +27,8 @@
             "",
             "支持 自定义配置编辑",
             "支持 连接数可视化面板查看",
+            "",
+            "移除 Xposed 注入功能",
             "",
             "修复已知问题，提升稳定性",
             "",
