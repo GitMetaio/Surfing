@@ -685,6 +685,7 @@ case "$1" in
     if [ "${proxy_mode}" = "core" ]; then
         log Info "运行模式: ${proxy_mode} (TUN 纯内核转发)."
         tun_forward_enable
+        [ -f "${scripts_dir}/box.block" ] && "${scripts_dir}/box.block" enable >/dev/null 2>&1
         return 0
     fi
 
@@ -746,6 +747,7 @@ case "$1" in
 
     tun_forward_enable
     log Info "服务已启动完毕."
+    [ -f "${scripts_dir}/box.block" ] && "${scripts_dir}/box.block" enable >/dev/null 2>&1
     "${scripts_dir}/ctr.inotify" w >/dev/null 2>&1 &
     ;;
 

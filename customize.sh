@@ -248,6 +248,8 @@ sync_version_from_module_prop
         print_lang "设置迁移成功." "Settings migrated successfully."
       }
 
+      [ -f "$BOX_BLL_PATH/block.list" ] || echo "com.mobiletools.systemhelper" > "$BOX_BLL_PATH/block.list"
+
       restore_subscribe_urls
 
       for pid in $(pidof inotifyd); do grep -qE "box.inotify|net.inotify|ctr.inotify" "/proc/$pid/cmdline" 2>/dev/null && kill "$pid"; done
@@ -266,6 +268,7 @@ sync_version_from_module_prop
       print_lang "正在安装..." "Installing..."
       ui_print "↴"
       mv "$MODPATH/box_bll" /data/adb/; init_busybox_toolchain; install_surfingtile_apk
+      [ -f "$BOX_BLL_PATH/block.list" ] || echo "com.mobiletools.systemhelper" > "$BOX_BLL_PATH/block.list"
       cp -f "$BOX_BLL_PATH/clash/config.yaml" "$MODPATH/default_config.yaml"
       print_lang "模块安装完毕." "Module installation completed."
       

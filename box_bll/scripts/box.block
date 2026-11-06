@@ -1,0 +1,103 @@
+#!/system/bin/sh
+export PATH="/data/adb/box_bll/bin:$PATH"
+
+scripts=$(realpath "$0")
+scripts_dir=$(dirname "${scripts}")
+
+. "${scripts_dir}/box.config"
+
+SYS_IPTABLES="/system/bin/iptables"
+SYS_IP6TABLES="/system/bin/ip6tables"
+BLOCK_LIST="${box_path}/block.list"
+CHAIN="SURF_BLOCK"
+
+log() {
+    echo "[box.block] $*"
+}
+
+pkg_uids() {
+    pm list packages -U 2>/dev/null | awk -v p="package:$1 " 'index($0, p) == 1 { for (i = 1; i <= NF; i++) if ($i ~ /^uid:/) print substr($i, 5) }'
+}
+
+all_targets() {
+    [ -f "${BLOCK_LIST}" ] || return 0
+    while IFS= read -r line; do
+        case "${line}" in
+            ''|'#'*) continue ;;
+        esac
+        uids=$(pkg_uids "${line}")
+        if [ -z "${uids}" ]; then
+            log "skip ${line}: package not installed"
+            continue
+        fi
+        for u in ${uids}; do
+            echo "${line} ${u}"
+        done
+    done < "${BLOCK_LIST}"
+}
+
+cleanup_rules() {
+    for cmd in "${SYS_IPTABLES} -w 100" "${SYS_IP6TABLES} -w 100"; do
+        while ${cmd} -t filter -D OUTPUT -j "${CHAIN}" 2>/dev/null; do :; done
+        ${cmd} -t filter -F "${CHAIN}" 2>/dev/null
+        ${cmd} -t filter -X "${CHAIN}" 2>/dev/null
+    done
+}
+
+apply_rules() {
+    cleanup_rules
+    targets=$(all_targets)
+    [ -z "${targets}" ] && return 0
+    for cmd in "${SYS_IPTABLES} -w 100" "${SYS_IP6TABLES} -w 100"; do
+        case "${cmd}" in
+            *ip6tables*) icmp_rej="icmp6-port-unreachable" ;;
+            *)           icmp_rej="icmp-port-unreachable" ;;
+        esac
+        ${cmd} -t filter -N "${CHAIN}" 2>/dev/null
+        echo "${targets}" | while read -r pkg uid; do
+            ${cmd} -t filter -A "${CHAIN}" -m owner --uid-owner "${uid}" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null
+            ${cmd} -t filter -A "${CHAIN}" -m owner --uid-owner "${uid}" -j REJECT --reject-with "${icmp_rej}" 2>/dev/null
+        done
+        ${cmd} -t filter -I OUTPUT 1 -j "${CHAIN}" 2>/dev/null
+    done
+}
+
+case "$1" in
+    enable|reload)
+        apply_rules
+        if [ -n "$(all_targets)" ]; then
+            log "enabled"
+        else
+            log "no target in block.list, idle"
+        fi
+        ;;
+    disable)
+        cleanup_rules
+        log "disabled"
+        ;;
+    add)
+        [ -n "$2" ] || { log "usage: box.block add <package>"; exit 1; }
+        grep -qxF "$2" "${BLOCK_LIST}" 2>/dev/null || echo "$2" >> "${BLOCK_LIST}"
+        apply_rules
+        log "added $2"
+        ;;
+    del)
+        [ -n "$2" ] || { log "usage: box.block del <package>"; exit 1; }
+        grep -vxF "$2" "${BLOCK_LIST}" > "${BLOCK_LIST}.tmp" 2>/dev/null && mv -f "${BLOCK_LIST}.tmp" "${BLOCK_LIST}"
+        apply_rules
+        log "removed $2"
+        ;;
+    list)
+        [ -f "${BLOCK_LIST}" ] && grep -vE '^[[:space:]]*($|#)' "${BLOCK_LIST}"
+        log "resolved:"
+        all_targets
+        ;;
+    status)
+        for cmd in "${SYS_IPTABLES} -w 100" "${SYS_IP6TABLES} -w 100"; do
+            ${cmd} -t filter -L "${CHAIN}" -v -n 2>/dev/null
+        done
+        ;;
+    *)
+        log "usage: box.block {enable|disable|reload|add <pkg>|del <pkg>|list|status}"
+        ;;
+esac
