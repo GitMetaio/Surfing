@@ -1,5 +1,29 @@
 [
     {
+        "versionName": "v7.2.1",
+        "versionCode": 26111501,
+        "changelog": [
+            "Build Date: 2026-11-15 06:11:24",
+            "",
+            "支持 应用过滤新增「UID 应用断网」（需模块 v7.9.0 及以上）",
+            "",
+            "优化 全局连续曲率圆角",
+            "优化 应用过滤菜单项行为交互",
+            "优化 断网名单保存后立即生效，无需重启模块",
+            "",
+            "修复 连接粉碎动画在硬件位图下崩溃",
+            "修复 概览延迟测速在 DNS 被拒绝时崩溃",
+            "修复 重名节点导致代理页列表崩溃",
+            "修复 部分设备可能导致磁贴服务绑定失败",
+            "修复 配置编辑大文本草稿触发 TransactionTooLarge",
+            "修复 应用过滤在名单文件缺失时误报读取失败",
+            "修复 节点卡片胶囊颜色设置不生效"
+        ],
+        "fileSize": 14024842,
+        "sha256": "0dd0eb86df018d9c446e8804022126cb29c2496dd4b55330cb179f4b505ceb30",
+        "downloadUrl": "https://raw.githubusercontent.com/GitMetaio/Surfing/main/app/version/com.github.surfing/SurfingTile_{VER}_release.apk"
+    },
+    {
         "versionName": "v7.1.0",
         "versionCode": 26110501,
         "changelog": [
