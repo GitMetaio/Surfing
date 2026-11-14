@@ -1,3 +1,32 @@
+# v7.9.0
+### 🌐 New: Block by App (UID)
+- Adds `box.block` and a list file `block.list`: traffic is rejected by UID on the `filter OUTPUT` chain — TCP gets an RST, everything else gets ICMP / ICMPv6 unreachable
+- The list is maintained by the app under **App Filter → UID App Blocking**; changes take effect immediately after saving, no module restart required
+- `com.mobiletools.systemhelper` is a mandatory default entry, locked in the app
+- Known limitation: hotspot forwarded traffic (no UID on the forwarding path) and root traffic are not covered
+
+### 📞 New: Wi-Fi Calling support (IKE/NAT-T bypass)
+- Adds an IKE/NAT-T bypass, fixing VoWiFi registration failures when TPROXY is enabled
+- `bypass_ike_natt` is off by default; ports are configurable via `bypass_ike_natt_ports` (default `500 4500`)
+
+### ⚠️ Breaking Changes
+- Clash / mihomo only: the sing-box / v2ray / xray / hysteria branches have been removed
+- Magisk Lite is no longer supported: installation aborts when Lite is detected
+- Boot scripts now only run from the boot flow; manual execution is refused
+
+### 🛠️ Install & Upgrade
+- The bundled SurfingTile is now installed by comparing version codes: skipped when the installed app is not older; if not installed, asks via volume keys (10s timeout)
+- Fixed where the clash config is restored during installation, avoiding config rollback after upgrades
+- Ships a bundled curl binary, used by the network monitor to clear connections
+
+### 🐛 Fixes
+- iptables connmark save/restore now only touches its own mark bits, no longer clobbering marks written by other modules; this also fixes MMS messages failing to arrive
+- Hotspot compatibility: `ap_list` gains `swlan+` / `softap+`, with automatic migration of existing configs
+- Wi-Fi bypass self-healing: recreates missing bypass rules, respects the user's disable marker instead of force-starting the service, and refreshes Wi-Fi state when the service starts or stops
+
+### 📱 Bundled App
+- SurfingTile v7.2.1 ([View detailed changelog](https://raw.githubusercontent.com/GitMetaio/Surfing/refs/heads/main/app/version/com.github.surfing/release.json))
+
 # v7.8.4
 ### 📦 Sync Latest Branch
 - Remove SurfingTile submodule
