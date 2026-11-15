@@ -254,6 +254,11 @@ proxy-groups:
   - name: Google
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/Google.svg"
     <<: *proxy_groups
+  # Claude / Gemini：继承普通服务的地区、策略和节点选项及顺序。
+  - name: Claude
+    <<: *proxy_groups
+  - name: Gemini
+    <<: *proxy_groups
   - name: GoogleFCM
     icon: "https://cdn.jsdelivr.net/gh/GitMetaio/Surfing@main/app/icon/GoogleFCM.svg"
     <<: *proxy_groups
@@ -484,6 +489,46 @@ rules:
   - DST-PORT,853,DNS连接
   - RULE-SET,自定义规则,特殊地址
   - RULE-SET,WebRTC_端/域,WebRTC
+  # Claude / Gemini：在通用 Google 规则前分别选择出口。
+  # Gemini 同时接管下列 Google 登录及共享资源域名，请统一选择合适的出口。
+  - DOMAIN-SUFFIX,anthropic.com,Claude
+  - DOMAIN-SUFFIX,claude.ai,Claude
+  - DOMAIN,robinfrontend-pa.googleapis.com,Gemini
+  - DOMAIN,robinfrontend-pa.mtls.googleapis.com,Gemini
+  - DOMAIN,webchannel-robinfrontend-pa.googleapis.com,Gemini
+  - DOMAIN,webchannel-robinfrontend-pa.mtls.googleapis.com,Gemini
+  - DOMAIN,oauth2.googleapis.com,Gemini
+  - DOMAIN,www.googleapis.com,Gemini
+  - DOMAIN,accountlinking-pa.googleapis.com,Gemini
+  - DOMAIN,notifications-pa.googleapis.com,Gemini
+  - DOMAIN,notifications-ueeshp-pa.googleapis.com,Gemini
+  - DOMAIN,signaler-pa.googleapis.com,Gemini
+  - DOMAIN,speechs3proto2-pa.googleapis.com,Gemini
+  - DOMAIN,feedback-pa.googleapis.com,Gemini
+  - DOMAIN,feedback-pa.mtls.googleapis.com,Gemini
+  - DOMAIN,play.googleapis.com,Gemini
+  - DOMAIN,push.clients6.google.com,Gemini
+  - DOMAIN,ai.google.dev,Gemini
+  - DOMAIN,alkalicore-pa.clients6.google.com,Gemini
+  - DOMAIN,geller-pa.googleapis.com,Gemini
+  - DOMAIN,fonts.googleapis.com,Gemini
+  - DOMAIN-SUFFIX,gemini.google.com,Gemini
+  - DOMAIN-SUFFIX,gemini.google,Gemini
+  - DOMAIN-SUFFIX,bard.google.com,Gemini
+  - DOMAIN-SUFFIX,aistudio.google.com,Gemini
+  - DOMAIN-SUFFIX,makersuite.google.com,Gemini
+  - DOMAIN-SUFFIX,generativeai.google,Gemini
+  - DOMAIN-SUFFIX,accounts.google.com,Gemini
+  - DOMAIN-SUFFIX,accounts.google.cn,Gemini
+  - DOMAIN-SUFFIX,myaccount.google.com,Gemini
+  - DOMAIN-SUFFIX,apis.google.com,Gemini
+  - DOMAIN-SUFFIX,gstatic.com,Gemini
+  - DOMAIN-SUFFIX,googleusercontent.com,Gemini
+  - DOMAIN-SUFFIX,recaptcha.net,Gemini
+  - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,Gemini
+  - DOMAIN-SUFFIX,ai.dev,Gemini
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,Gemini
+  - DOMAIN-SUFFIX,alkalimakersuite-pa.clients6.google.com,Gemini
   - RULE-SET,GoogleFCM_域,GoogleFCM
   - RULE-SET,YouTube_域,YouTube
   - RULE-SET,Google_域,Google
