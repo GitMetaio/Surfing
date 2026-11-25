@@ -111,10 +111,14 @@ start_redirect() {
 
   ${iptables} -t nat -A BOX_EXTERNAL -p tcp -i lo -j REDIRECT --to-ports "${redir_port}"
   if [ "${#ap_list[@]}" -ne 0 ]; then
-    for ap in "${ap_list[@]}" ; do
-      ${iptables} -t nat -A BOX_EXTERNAL -p tcp -i "${ap}" -j REDIRECT --to-ports "${redir_port}"
-    done
-    log Info "外部接口: [${ap_list[*]}] NAT REDIRECT 已就绪."
+    if [ "${apwork:-true}" = "true" ]; then
+      for ap in "${ap_list[@]}" ; do
+        ${iptables} -t nat -A BOX_EXTERNAL -p tcp -i "${ap}" -j REDIRECT --to-ports "${redir_port}"
+      done
+      log Info "外部接口: [${ap_list[*]}] NAT REDIRECT 已就绪."
+    else
+      log Info "热点代理已关闭 (apwork=false): 外部接口 [${ap_list[*]}] 将绕过 NAT REDIRECT."
+    fi
   fi
 
   ${iptables} -t nat -I PREROUTING -j BOX_EXTERNAL
@@ -188,6 +192,11 @@ start_redirect() {
   if { [ "${mihomo_dns_forward}" = "true" ] && [ "${bin_name}" = "mihomo" ]; } || [ "${bin_name}" = "clash" ]; then
     ${iptables} -t nat -N CLASH_DNS_EXTERNAL
     ${iptables} -t nat -F CLASH_DNS_EXTERNAL
+    if [ "${apwork:-true}" != "true" ] && [ "${#ap_list[@]}" -ne 0 ]; then
+      for ap in "${ap_list[@]}" ; do
+        ${iptables} -t nat -A CLASH_DNS_EXTERNAL -i "${ap}" -j RETURN
+      done
+    fi
     ${iptables} -t nat -A CLASH_DNS_EXTERNAL -p udp --dport 53 -j REDIRECT --to-ports "${clash_dns_port}"
     ${iptables} -t nat -I PREROUTING -j CLASH_DNS_EXTERNAL
 
@@ -286,11 +295,15 @@ start_tproxy() {
   ${iptables} -t mangle -A BOX_EXTERNAL -p udp -i lo -j TPROXY --on-port "${tproxy_port}" --tproxy-mark "${mark_id}"
 
   if [ "${#ap_list[@]}" -ne 0 ]; then
-    for ap in "${ap_list[@]}" ; do
-      ${iptables} -t mangle -A BOX_EXTERNAL -p tcp -i "${ap}" -j TPROXY --on-port "${tproxy_port}" --tproxy-mark "${mark_id}"
-      ${iptables} -t mangle -A BOX_EXTERNAL -p udp -i "${ap}" -j TPROXY --on-port "${tproxy_port}" --tproxy-mark "${mark_id}"
-    done
-    [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "外部接口: [${ap_list[*]}] TPROXY 劫持已就绪."
+    if [ "${apwork:-true}" = "true" ]; then
+      for ap in "${ap_list[@]}" ; do
+        ${iptables} -t mangle -A BOX_EXTERNAL -p tcp -i "${ap}" -j TPROXY --on-port "${tproxy_port}" --tproxy-mark "${mark_id}"
+        ${iptables} -t mangle -A BOX_EXTERNAL -p udp -i "${ap}" -j TPROXY --on-port "${tproxy_port}" --tproxy-mark "${mark_id}"
+      done
+      [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "外部接口: [${ap_list[*]}] TPROXY 劫持已就绪."
+    else
+      [ "${iptables}" = "${SYS_IPTABLES} -w 100" ] && log Info "热点代理已关闭 (apwork=false): 外部接口 [${ap_list[*]}] 将绕过 TPROXY."
+    fi
   fi
 
   ${iptables} -t mangle -I PREROUTING -j BOX_EXTERNAL
@@ -397,6 +410,11 @@ start_tproxy() {
       if [ "$use_nat_table" = "true" ]; then
           ${iptables} -t nat -N CLASH_DNS_EXTERNAL
           ${iptables} -t nat -F CLASH_DNS_EXTERNAL
+          if [ "${apwork:-true}" != "true" ] && [ "${#ap_list[@]}" -ne 0 ]; then
+            for ap in "${ap_list[@]}" ; do
+              ${iptables} -t nat -A CLASH_DNS_EXTERNAL -i "${ap}" -j RETURN
+            done
+          fi
           ${iptables} -t nat -A CLASH_DNS_EXTERNAL -p udp --dport 53 -j REDIRECT --to-ports "${clash_dns_port}"
           ${iptables} -t nat -I PREROUTING -j CLASH_DNS_EXTERNAL
 
@@ -413,6 +431,11 @@ start_tproxy() {
       else
           ${iptables} -t mangle -N CLASH_DNS_EXTERNAL
           ${iptables} -t mangle -F CLASH_DNS_EXTERNAL
+          if [ "${apwork:-true}" != "true" ] && [ "${#ap_list[@]}" -ne 0 ]; then
+            for ap in "${ap_list[@]}" ; do
+              ${iptables} -t mangle -A CLASH_DNS_EXTERNAL -i "${ap}" -j RETURN
+            done
+          fi
 
           ${iptables} -t mangle -A CLASH_DNS_EXTERNAL -p udp --dport 53 -j TPROXY --on-port "${tproxy_port}" --tproxy-mark "${mark_id}"
           ${iptables} -t mangle -I PREROUTING -j CLASH_DNS_EXTERNAL
@@ -598,6 +621,57 @@ tun_forward_ip_rules_del() {
         ${SYS_IP} rule del pref 6000
         ${SYS_IP} rule del pref 7000
         ${SYS_IP} rule del pref 8000
+        ${SYS_IP} rule del pref 8990
+        ${SYS_IP} -6 rule del pref 8990
+    } >/dev/null 2>&1
+}
+
+tun_bypass_ap_ip_rules() {
+    {
+        ${SYS_IP} rule add not iif lo goto 9010 pref 8990
+        ${SYS_IP} -6 rule add not iif lo goto 9010 pref 8990
+    } >/dev/null 2>&1
+}
+
+ap_dns_bypass_disable() {
+    {
+        while ${SYS_IPTABLES} -w 100 -t nat -D PREROUTING -j AP_DNS_BYPASS; do :; done
+        ${SYS_IPTABLES} -w 100 -t nat -F AP_DNS_BYPASS
+        ${SYS_IPTABLES} -w 100 -t nat -X AP_DNS_BYPASS
+
+        while ${SYS_IP6TABLES} -w 100 -D INPUT -j AP_DNS6_BYPASS; do :; done
+        ${SYS_IP6TABLES} -w 100 -F AP_DNS6_BYPASS
+        ${SYS_IP6TABLES} -w 100 -X AP_DNS6_BYPASS
+    } >/dev/null 2>&1
+}
+
+ap_dns_bypass_enable() {
+    ap_dns_bypass_disable
+    [ "${apwork:-true}" = "true" ] && return 0
+    [ "${#ap_list[@]}" -eq 0 ] && return 0
+
+    local bypass_dns="${ap_bypass_dns:-223.5.5.5}"
+    local ap priv
+    {
+        ${SYS_IPTABLES} -w 100 -t nat -N AP_DNS_BYPASS
+        ${SYS_IPTABLES} -w 100 -t nat -F AP_DNS_BYPASS
+        for ap in "${ap_list[@]}"; do
+            for priv in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
+                ${SYS_IPTABLES} -w 100 -t nat -A AP_DNS_BYPASS -i "${ap}" -d "${priv}" -p udp --dport 53 -j DNAT --to-destination "${bypass_dns}:53"
+                ${SYS_IPTABLES} -w 100 -t nat -A AP_DNS_BYPASS -i "${ap}" -d "${priv}" -p tcp --dport 53 -j DNAT --to-destination "${bypass_dns}:53"
+            done
+        done
+        ${SYS_IPTABLES} -w 100 -t nat -I PREROUTING 1 -j AP_DNS_BYPASS
+
+        ${SYS_IP6TABLES} -w 100 -N AP_DNS6_BYPASS
+        ${SYS_IP6TABLES} -w 100 -F AP_DNS6_BYPASS
+        for ap in "${ap_list[@]}"; do
+            ${SYS_IP6TABLES} -w 100 -A AP_DNS6_BYPASS -i "${ap}" -p udp --dport 53 -j REJECT || \
+                ${SYS_IP6TABLES} -w 100 -A AP_DNS6_BYPASS -i "${ap}" -p udp --dport 53 -j DROP
+            ${SYS_IP6TABLES} -w 100 -A AP_DNS6_BYPASS -i "${ap}" -p tcp --dport 53 -j REJECT --reject-with tcp-reset || \
+                ${SYS_IP6TABLES} -w 100 -A AP_DNS6_BYPASS -i "${ap}" -p tcp --dport 53 -j DROP
+        done
+        ${SYS_IP6TABLES} -w 100 -I INPUT 1 -j AP_DNS6_BYPASS
     } >/dev/null 2>&1
 }
 
@@ -610,6 +684,16 @@ tun_forward_iptables_rules() {
 
 tun_forward_enable() {
     [ "${proxy_mode}" != "core" ] && [ "${proxy_method}" != "MIXED" ] && ! ifconfig "${tun_device}" >/dev/null 2>&1 && return 0
+
+    if [ "${apwork:-true}" != "true" ]; then
+        if ! ifconfig "${tun_device}" >/dev/null 2>&1; then
+            wait_tun_device || return 1
+        fi
+        tun_forward_disable
+        tun_bypass_ap_ip_rules
+        log Info "热点代理已关闭 (apwork=false): 已绕过虚拟网卡 [${tun_device}] 热点共享转发."
+        return 0
+    fi
 
     if ! ifconfig "${tun_device}" >/dev/null 2>&1; then
         wait_tun_device || return 1
@@ -653,6 +737,7 @@ destroy_all_rules() {
     iptables="${SYS_IPTABLES} -w 100" && stop_redirect
 
     tun_forward_disable
+    ap_dns_bypass_disable
 
     echo 1 > /proc/sys/net/netfilter/nf_conntrack_flush
   } >/dev/null 2>&1
@@ -685,6 +770,7 @@ case "$1" in
     if [ "${proxy_mode}" = "core" ]; then
         log Info "运行模式: ${proxy_mode} (TUN 纯内核转发)."
         tun_forward_enable
+        ap_dns_bypass_enable
         [ -f "${scripts_dir}/box.block" ] && "${scripts_dir}/box.block" enable >/dev/null 2>&1
         return 0
     fi
@@ -746,6 +832,7 @@ case "$1" in
     fi
 
     tun_forward_enable
+    ap_dns_bypass_enable
     log Info "服务已启动完毕."
     [ -f "${scripts_dir}/box.block" ] && "${scripts_dir}/box.block" enable >/dev/null 2>&1
     "${scripts_dir}/ctr.inotify" w >/dev/null 2>&1 &
@@ -784,6 +871,7 @@ case "$1" in
 
     if [ "${proxy_mode}" = "core" ]; then
         tun_forward_enable
+        ap_dns_bypass_enable
         log Info "规则重构完成 (TUN 纯内核转发)."
         return 0
     fi
@@ -833,6 +921,7 @@ case "$1" in
     fi
 
     tun_forward_enable
+    ap_dns_bypass_enable
     log Info "防火墙规则重构完毕，服务已恢复运行."
    "${scripts_dir}/ctr.inotify" w >/dev/null 2>&1 &
     ;;
